@@ -1,0 +1,6 @@
+uproot
+numpy
+awkward
+pandas
+CLUEstering
+patatune
