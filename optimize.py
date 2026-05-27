@@ -1,73 +1,62 @@
 """
 Entry point for CLUEstering parameter optimisation.
 
+Runs a single MOPSO over the joint 10-parameter space [CEE×5, CHE×5].
+CLUEstering is run separately on CEE and CHE LCs per event, but quality
+is scored globally across both subdetectors.
+
 Usage
 -----
     python optimize.py
 
-All tunable knobs (data paths, CLUEstering defaults, MOPSO settings, objective
-weights) live in config.py.  The objective function lives in objective.py.
-
 Output
 ------
-    pareto_front.csv   — Pareto-optimal parameter sets and objective values
+    pareto_front.csv          — Pareto-optimal solutions (params + objectives)
+    pareto_front.json         — same, structured with named keys
+    pareto_positions.npy      — (N, 10) array of parameter vectors
+    pareto_fitnesses.npy      — (N, 3)  array of [F1, F2, F3] values
 """
 
 import csv
-import time
+import json
 
 import numpy as np
 import patatune
 
 from config import (
-    PATH, CONFIG_FILES, PARTICLE_TYPES,
-    DEFAULT_PARAMS, PARAM_NAMES, LOWER_BOUNDS, UPPER_BOUNDS,
+    PARAM_NAMES, LOWER_BOUNDS, UPPER_BOUNDS, DEFAULT_PARAMS,
     NUM_PARTICLES, NUM_ITERATIONS, INERTIA, COGNITIVE, SOCIAL,
     MAX_PARETO, TOPOLOGY, RANDOM_SEED,
 )
-from data import load_all, build_df_lc, build_lc_energy_lookup
-from metrics import compute_baseline
-from objective import make_objective_fn
+from data import load_events, validate_events
+from objective import make_objective
+
+_OBJ_NAMES = ['F1_purity', 'F2_efficiency_deficit', 'F3_fragmentation']
 
 
 def main():
-    # ── load data ──────────────────────────────────────────────────────────────
+    # ── load and validate data ──────────────────────────────────────────────────
     print("=== Loading data ===")
-    raw              = load_all(PATH, CONFIG_FILES)
-    df_lc            = build_df_lc(raw)
-    lc_energy_lookup = build_lc_energy_lookup(df_lc)
-    print(f"LC rows: {len(df_lc):,}\n")
-
-    # ── CLUE3D baseline ────────────────────────────────────────────────────────
-    print("=== Computing CLUE3D baseline ===")
-    baseline = compute_baseline(raw, lc_energy_lookup)
-    for ptype, m in baseline.items():
-        print(f"  {ptype:>4s}  L1={m['L1']:.4f}  r={m['r']:.4f}  NT={m['NT']:.2f}")
+    events = load_events()
+    validate_events(events)
     print()
 
-    # ── objective ──────────────────────────────────────────────────────────────
-    objective_fn = make_objective_fn(raw, df_lc, lc_energy_lookup, baseline)
+    # ── build objective ─────────────────────────────────────────────────────────
+    obj_fn = make_objective(events)
 
     objective = patatune.ElementWiseObjective(
-        objective_fn,
+        obj_fn,
         num_objectives=3,
-        directions=['minimize', 'maximize', 'minimize'],
-        objective_names=['purity_delta', 'energy_ratio', 'count_delta'],
+        directions=['minimize', 'minimize', 'minimize'],
+        objective_names=_OBJ_NAMES,
     )
 
-    # ── timing probe ───────────────────────────────────────────────────────────
-    print("=== Timing probe (default params) ===")
-    t0       = time.time()
-    sample   = objective_fn(DEFAULT_PARAMS)
-    per_call = time.time() - t0
-    print(f"  one call : {per_call:.2f}s")
-    print(f"  per iter : {per_call * NUM_PARTICLES / 60:.1f} min  ({NUM_PARTICLES} particles)")
-    print(f"  total    : {per_call * NUM_PARTICLES * NUM_ITERATIONS / 3600:.1f} h  ({NUM_ITERATIONS} iters)")
-    print(f"  result   : purity_delta={sample[0]:.4f}  energy_ratio={sample[1]:.4f}  count_delta={sample[2]:.4f}")
-    print()
+    # ── run MOPSO ──────────────────────────────────────────────────────────────
+    print("=== Running MOPSO (joint CEE+CHE, 10 parameters) ===")
+    print(f"  particles={NUM_PARTICLES}  iterations={NUM_ITERATIONS}")
+    print(f"  params: {PARAM_NAMES[:5]}  (CEE)")
+    print(f"          {PARAM_NAMES[5:]}  (CHE)\n")
 
-    # ── MOPSO ──────────────────────────────────────────────────────────────────
-    print("=== Running MOPSO ===")
     patatune.Randomizer.rng = np.random.default_rng(RANDOM_SEED)
     patatune.Logger.setLevel('WARNING')
 
@@ -86,34 +75,52 @@ def main():
     )
 
     pareto = mopso.optimize(num_iterations=NUM_ITERATIONS)
-    print(f"\nDone. Pareto front: {len(pareto)} solutions\n")
+    print(f"\nDone — {len(pareto)} Pareto-optimal solutions\n")
 
-    # ── results ────────────────────────────────────────────────────────────────
-    obj_names = ['purity_delta', 'energy_ratio', 'count_delta']
-    header    = PARAM_NAMES + obj_names
-
+    # ── print summary ───────────────────────────────────────────────────────────
+    header = PARAM_NAMES + _OBJ_NAMES
     print("=== Pareto front ===")
-    print("  ".join(f"{h:>14s}" for h in header))
-    rows = _extract_pareto_rows(pareto)
-    for row in rows:
-        print("  ".join(f"{v:14.6f}" for v in row))
-
-    with open('pareto_front.csv', 'w', newline='') as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-        writer.writerows(rows)
-    print(f"\nSaved {len(rows)} solutions → pareto_front.csv")
-
-
-def _extract_pareto_rows(pareto):
-    """Extract (params + objectives) from each Pareto solution."""
-    rows = []
+    print("  ".join(f"{h:>22s}" for h in header))
     for sol in pareto:
-        # patatune solution objects expose .position and .objectives
-        pos  = list(sol.position)
-        objs = list(sol.objectives)
-        rows.append(pos + objs)
-    return rows
+        vals = list(sol.position) + list(sol.objectives)
+        print("  ".join(f"{v:22.6f}" for v in vals))
+
+    # ── save results ────────────────────────────────────────────────────────────
+    print("\n=== Saving results ===")
+    _save_csv(pareto)
+    _save_json(pareto)
+    _save_npy(pareto)
+    print("All done.")
+
+
+# ── Output helpers ─────────────────────────────────────────────────────────────
+
+def _save_csv(pareto):
+    header = PARAM_NAMES + _OBJ_NAMES
+    rows   = [[*sol.position, *sol.objectives] for sol in pareto]
+    with open('pareto_front.csv', 'w', newline='') as f:
+        csv.writer(f).writerow(header)
+        csv.writer(f).writerows(rows)
+    print(f"  pareto_front.csv  ({len(rows)} solutions)")
+
+
+def _save_json(pareto):
+    archive = [
+        {
+            'params':     dict(zip(PARAM_NAMES,  sol.position.tolist())),
+            'objectives': dict(zip(_OBJ_NAMES,   sol.objectives.tolist())),
+        }
+        for sol in pareto
+    ]
+    with open('pareto_front.json', 'w') as f:
+        json.dump(archive, f, indent=2)
+    print("  pareto_front.json")
+
+
+def _save_npy(pareto):
+    np.save('pareto_positions.npy', np.array([sol.position   for sol in pareto]))
+    np.save('pareto_fitnesses.npy',  np.array([sol.objectives for sol in pareto]))
+    print("  pareto_positions.npy / pareto_fitnesses.npy")
 
 
 if __name__ == '__main__':

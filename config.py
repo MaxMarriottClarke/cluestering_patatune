@@ -1,12 +1,12 @@
-# ── Data ──────────────────────────────────────────────────────────────────────
-PATH = '/eos/user/m/mmarriot/SWAN_projects/cluestering_opt'
+# ── Data ───────────────────────────────────────────────────────────────────────
+DATA_DIR = 'Data'
 
-CONFIG_FILES = {
-    'em':   'tune/e.root',
-    'pion': 'tune/pi.root',
+FILES = {
+    'ee':    'e_energy.root',   # 500 two-electron events
+    'epion': 'pi_energy.root',  # 500 electron-pion events
 }
 
-PARTICLE_TYPES = ['em', 'pion']
+TRUTH_BRANCH = 'ticlDumper/simtrackstersCP'
 
 BRANCHES = [
     'vertices_indexes',
@@ -17,33 +17,32 @@ BRANCHES = [
     'vertices_multiplicity',
 ]
 
-TRUTH_BRANCH = 'ticlDumper/simtrackstersCP'
-CLUE_BRANCH  = 'ticlDumper/hltTiclTrackstersCLUE3DHigh'
+# ── Subdetector boundary ───────────────────────────────────────────────────────
+# CLUEstering is run separately on each region (different detector geometry),
+# but quality is scored globally across both.
+CEE_Z_BOUNDARY = 352.0   # |z| < 352 cm  => CEE (electromagnetic)
+                         # |z| >= 352 cm  => CHE (hadronic)
+SUBDETS = ['CEE', 'CHE']
 
-# ── Default CLUEstering parameters ────────────────────────────────────────────
-DC   = 3.0   # spatial density radius [cm]
-RHOC = 5.0   # min local density to be a seed
-DO   = 3.0   # outlier delta threshold
-DS   = 3.0   # seed delta threshold
-WZ   = 0.5   # z-weight: compress z relative to x/y so layers don't dominate
+# ── Parameters — one joint 10-element vector [CEE×5, CHE×5] ───────────────────
+PARAM_NAMES = [
+    'density_radius_cee', 'min_density_cee', 'outlier_distance_cee',
+    'seeding_distance_cee', 'w_z_cee',
+    'density_radius_che', 'min_density_che', 'outlier_distance_che',
+    'seeding_distance_che', 'w_z_che',
+]
 
-DEFAULT_PARAMS = [DC, RHOC, DO, DS, WZ]
-PARAM_NAMES    = ['dc', 'rhoc', 'do', 'ds', 'wz']
+#                             CEE                              CHE
+LOWER_BOUNDS = [0.5,  0.5,  0.5,  0.5,  0.1,    0.5,  0.5,  0.5,  0.5,  0.1]
+UPPER_BOUNDS = [5.0, 10.0, 10.0, 10.0,  5.0,    8.0, 15.0, 15.0, 15.0,  5.0]
+DEFAULT_PARAMS = [2.0,  2.0,  2.0,  2.0,  1.0,  3.0,  3.0,  3.0,  3.0,  1.0]
 
-# Parameter search bounds for MOPSO
-LOWER_BOUNDS = [1.0,  0.1,  1.0,  1.0, 0.2]
-UPPER_BOUNDS = [8.0, 10.0, 20.0, 20.0, 0.8]
-
-# ── Objective weights ─────────────────────────────────────────────────────────
-ALPHA  = 0.5   # EM weight; pion weight = 1 - ALPHA
-LAMBDA = 2.0   # floor-penalty weight for mean N_T < 2
-
-# ── MOPSO hyperparameters ─────────────────────────────────────────────────────
+# ── MOPSO hyperparameters ──────────────────────────────────────────────────────
 NUM_PARTICLES  = 30
-NUM_ITERATIONS = 20
-INERTIA        = 0.5
+NUM_ITERATIONS = 50
+INERTIA        = 0.4
 COGNITIVE      = 1.5
-SOCIAL         = 1.5
+SOCIAL         = 2.0
 MAX_PARETO     = 100
 TOPOLOGY       = 'random'
 RANDOM_SEED    = 42

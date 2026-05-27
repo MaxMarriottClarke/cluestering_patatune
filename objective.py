@@ -1,182 +1,300 @@
 """
-Objective function for CLUEstering parameter optimisation.
+Objective functions for CLUEstering parameter tuning.
 
-This is the primary file to edit when changing what "good clustering" means.
+CLUEstering is run independently on CEE and CHE LCs (different detector geometry
+requires different parameters), but quality is scored globally across both
+subdetectors — a trackster is just a trackster regardless of which region it
+came from.
 
-To add or change an objective:
-  1. Modify _run_and_score() to compute additional per-event metrics.
-  2. Update objective_fn inside make_objective_fn() to return the new values.
-  3. Update the directions list in optimize.py to match ('minimize'/'maximize').
+Three objectives — all minimised:
 
-Current objectives (returned by objective_fn as [f1, f2, f3]):
-  f1  purity_delta  — δ(L1) vs CLUE3D baseline; minimise
-  f2  energy_ratio  — weighted mean r across particle types; maximise
-  f3  count_delta   — δ(N_T) + floor penalty for N_T < 2; minimise
+  F1  purity      mean over events of [max RecoToSim score across all tracksters]
+                  0 = every trackster is perfectly pure
+                  1 = every trackster is entirely contaminated
 
-Parameters: x = [dc, rhoc, do, ds, wz]
-Weights:    ALPHA (EM fraction) and LAMBDA (floor penalty) live in config.py
+  F2  efficiency  mean over events of [1 - min(CP efficiency across both CPs)]
+                  0 = both CPs fully recovered
+                  1 = at least one CP entirely lost
+
+  F3  fragmentation  mean over events of [extra tracksters assigned to same CP]
+                  = sum over CPs of max(0, N_tracksters_assigned - 1)
+                  0 = each CP has exactly one trackster (ideal)
+                  1+ = CPs are being split — e.g. a pion's CEE and CHE portions
+                       are two separate tracksters both assigned to the same CP
+
+  Note on F3: a pion event naturally produces 3 tracksters (1 electron in CEE,
+  1 pion-CEE portion, 1 pion-CHE portion).  Penalising N_total > 2 would punish
+  a perfect reconstruction.  Fragmentation counts extra tracksters *per CP*,
+  which is zero for that 3-trackster case if each is cleanly assigned.
+
+Infeasibility: if total tracksters (CEE + CHE combined) < 2 in any event,
+               return (inf, inf, inf).
+
+Public entry point:
+    make_objective(events) -> callable(params[10]) -> [F1, F2, F3]
+    params[:5] = [density_radius, min_density, outlier_distance,
+                  seeding_distance, w_z]  for CEE
+    params[5:] = same five parameters                             for CHE
 """
 
 import numpy as np
 import pandas as pd
-import CLUEstering as clue
 
-from config import PARTICLE_TYPES, ALPHA, LAMBDA
-from data import assign_lcs_to_particles
-from metrics import compute_r2s
+try:
+    import CLUEstering as clue
+except ImportError:
+    clue = None   # raises a clear error at runtime if clustering is attempted
+
+from config import SUBDETS
 
 
 # ── CLUEstering wrapper ────────────────────────────────────────────────────────
 
-def run_cluestering(xs, ys, zs, energies, dc, rhoc, do, ds, wz):
-    """Run CLUEstering on one event's LC point cloud. Returns cluster_ids; -1 = outlier."""
-    data = pd.DataFrame({
-        'x0': xs, 'x1': ys, 'x2': wz * zs, 'weight': energies
-    })
-    c = clue.clusterer(float(dc), float(rhoc), float(do), float(ds))
-    c.read_data(data)
-    c.run_clue()
-    return np.array(c.cluster_ids)
-
-
-# ── Core scoring loop ──────────────────────────────────────────────────────────
-
-def _delta(new_val, base_val, higher_is_better=False):
-    """Signed relative change vs baseline. Negative = improvement over baseline."""
-    if base_val == 0:
-        return 0.0
-    if higher_is_better:
-        return (base_val - new_val) / base_val
-    return (new_val - base_val) / base_val
-
-
-def _run_and_score(params, raw, truth_lc_by_eid, lc_energy_lookup,
-                   particle_types=None):
+def run_cluestering(lcs, density_radius, min_density,
+                    outlier_distance, seeding_distance, w_z):
     """
-    Run CLUEstering with *params* on every event and return mean metrics.
+    Run CLUEstering on one subdetector's LC point cloud.
 
     Parameters
     ----------
-    truth_lc_by_eid : dict
-        Pre-grouped truth LCs: {global_event_id: DataFrame slice}.
-        Build once with _group_truth_lcs(df_lc) before the optimisation loop.
+    lcs : dict with keys 'indexes', 'x', 'y', 'z', 'energy'
+        Must be non-empty.
 
     Returns
     -------
-    scores : {'em': {'L1': float, 'r': float, 'NT': float}, 'pion': {...}}
+    tracksters : list of dicts, each with 'lc_indexes' and 'lc_energies'
     """
-    if particle_types is None:
-        particle_types = PARTICLE_TYPES
+    if clue is None:
+        raise ImportError("CLUEstering is not installed in this environment")
 
-    dc, rhoc, do, ds, wz = params
-    n_events   = min(len(raw[p]['truth']['vertices_indexes']) for p in particle_types)
-    scores     = {p: {'L1': [], 'r': [], 'NT': []} for p in particle_types}
-    global_eid = 0
+    data = pd.DataFrame({
+        'x0':     lcs['x'],
+        'x1':     lcs['y'],
+        'x2':     lcs['z'] * float(w_z),   # z axis scaled by w_z
+        'weight': lcs['energy'],
+    })
 
-    for event_idx in range(n_events):
-        for ptype in particle_types:
-            lc_energies = lc_energy_lookup.get(global_eid, {})
+    c = clue.clusterer(
+        float(density_radius),
+        float(min_density),
+        float(outlier_distance),
+        float(seeding_distance),
+    )
+    c.read_data(data)
+    c.run_clue()
 
-            ev = truth_lc_by_eid.get(global_eid)
-            if ev is None or len(ev) == 0:
-                global_eid += 1
-                continue
-
-            xs       = ev['x'].to_numpy()
-            ys       = ev['y'].to_numpy()
-            zs       = ev['z'].to_numpy()
-            energies = ev['energy'].to_numpy()
-            lc_idxs  = ev['lc_idx'].to_numpy()
-
-            cluster_ids = run_cluestering(xs, ys, zs, energies, dc, rhoc, do, ds, wz)
-
-            mask           = cluster_ids != -1
-            lc_idxs_cl     = lc_idxs[mask]
-            energies_cl    = energies[mask]
-            cluster_ids_cl = cluster_ids[mask]
-            unique_ids     = np.unique(cluster_ids_cl)
-            N_T            = len(unique_ids)
-
-            _, assigned   = assign_lcs_to_particles(raw[ptype]['truth'], event_idx)
-            truth_lc_sets = {cp: set(lcs) for cp, lcs in assigned.items() if lcs}
-
-            total_reco  = float(energies_cl.sum())
-            total_truth = sum(lc_energies.values())
-            r = min(total_reco / total_truth, 1.0) if total_truth > 0 else 0.0
-
-            if N_T == 0 or not truth_lc_sets:
-                L1 = 1.0
-            else:
-                weighted_sum, total_reco_e = 0.0, 0.0
-                for cid in unique_ids:
-                    sel      = cluster_ids_cl == cid
-                    reco_set = set(lc_idxs_cl[sel])
-                    e_reco   = float(energies_cl[sel].sum())
-                    best_r2s = min(
-                        compute_r2s(reco_set, sim_set, lc_energies)
-                        for sim_set in truth_lc_sets.values()
-                    )
-                    weighted_sum  += e_reco * best_r2s
-                    total_reco_e  += e_reco
-                L1 = weighted_sum / total_reco_e if total_reco_e > 0 else 1.0
-
-            scores[ptype]['L1'].append(L1)
-            scores[ptype]['r'].append(r)
-            scores[ptype]['NT'].append(N_T)
-            global_eid += 1
-
-    return {p: {k: float(np.mean(v)) for k, v in s.items()} for p, s in scores.items()}
+    cluster_ids = np.array(c.cluster_ids)
+    return _extract_tracksters(cluster_ids, lcs)
 
 
-def _group_truth_lcs(df_lc):
-    """Pre-group truth LCs by global_event_id for O(1) lookup inside the scoring loop."""
-    truth = df_lc[df_lc['source'] == 'truth']
-    return {geid: grp for geid, grp in truth.groupby('global_event_id')}
+def _extract_tracksters(cluster_ids, lcs):
+    """Convert cluster_id array to list of trackster dicts. Outliers (id -1) are dropped."""
+    tracksters = []
+    for cid in np.unique(cluster_ids):
+        if cid == -1:
+            continue
+        mask = cluster_ids == cid
+        tracksters.append({
+            'lc_indexes':  lcs['indexes'][mask],
+            'lc_energies': lcs['energy'][mask],
+        })
+    return tracksters
+
+
+def filter_lcs_by_subdet(all_lcs, subdet):
+    """Return the subset of all_lcs whose subdet label matches."""
+    mask = all_lcs['subdet'] == subdet
+    return {
+        'indexes': all_lcs['indexes'][mask],
+        'x':       all_lcs['x'][mask],
+        'y':       all_lcs['y'][mask],
+        'z':       all_lcs['z'][mask],
+        'energy':  all_lcs['energy'][mask],
+    }
+
+
+# ── Scoring primitives ─────────────────────────────────────────────────────────
+
+def reco_to_sim_score(trackster_lc_indexes, trackster_lc_energies, cp_lc_index_set):
+    """
+    Fraction of trackster energy that does NOT come from CP j.
+    0 = perfectly pure,  1 = fully contaminated.
+    cp_lc_index_set contains LC indexes from *both* CEE and CHE for this CP.
+    """
+    total = float(np.asarray(trackster_lc_energies).sum())
+    if total == 0:
+        return 0.0
+    impure = sum(
+        float(e)
+        for idx, e in zip(trackster_lc_indexes, trackster_lc_energies)
+        if idx not in cp_lc_index_set
+    )
+    return impure / total
+
+
+def assign_tracksters_to_cps(tracksters, sim_showers):
+    """
+    Assign each trackster to the CP that minimises its RecoToSim score.
+    CP LC index sets span both CEE and CHE — the trackster just needs to
+    share LCs with the right CP regardless of subdetector.
+
+    Returns
+    -------
+    assignments : dict  trackster_idx -> (best_cp_id, score)
+    """
+    assignments = {}
+    for t_id, trackster in enumerate(tracksters):
+        best_cp, best_score = None, np.inf
+        for cp in sim_showers:
+            cp_set = set(cp['lc_indexes'].tolist())
+            s = reco_to_sim_score(
+                trackster['lc_indexes'], trackster['lc_energies'], cp_set
+            )
+            if s < best_score:
+                best_score = s
+                best_cp    = cp['shower_id']
+        assignments[t_id] = (best_cp, best_score)
+    return assignments
+
+
+def _shared_energy(trackster, cp):
+    """Energy of LCs in trackster that also belong to cp (any subdetector)."""
+    cp_set = set(cp['lc_indexes'].tolist())
+    return float(sum(
+        float(e)
+        for idx, e in zip(trackster['lc_indexes'], trackster['lc_energies'])
+        if idx in cp_set
+    ))
+
+
+# ── Objective sub-functions ────────────────────────────────────────────────────
+
+def _objective_purity(events_results):
+    """
+    F1: mean over events of max RecoToSim score across all tracksters.
+    Tracksters from CEE and CHE are treated identically.
+    """
+    per_event = []
+    for result in events_results:
+        if result['infeasible']:
+            return np.inf
+        worst = max(score for _, score in result['assignments'].values())
+        per_event.append(worst)
+    return float(np.mean(per_event))
+
+
+def _objective_efficiency(events_results):
+    """
+    F2: mean over events of (1 - min CP efficiency).
+
+    CP efficiency = total energy recovered across ALL tracksters assigned to it
+                    (summing CEE and CHE tracksters together)
+                    / CP true_energy (which already spans both subdetectors).
+    """
+    per_event = []
+    for result in events_results:
+        if result['infeasible']:
+            return np.inf
+
+        sim_showers = result['sim_showers']
+        tracksters  = result['tracksters']
+        assignments = result['assignments']
+
+        cp_shared = {cp['shower_id']: 0.0 for cp in sim_showers}
+        for t_id, trackster in enumerate(tracksters):
+            best_cp_id = assignments[t_id][0]
+            cp = next(cp for cp in sim_showers if cp['shower_id'] == best_cp_id)
+            cp_shared[best_cp_id] += _shared_energy(trackster, cp)
+
+        efficiencies = [
+            cp_shared[cp['shower_id']] / cp['true_energy']
+            if cp['true_energy'] > 0 else 0.0
+            for cp in sim_showers
+        ]
+        per_event.append(1.0 - min(efficiencies))
+
+    return float(np.mean(per_event))
+
+
+def _objective_fragmentation(events_results):
+    """
+    F3: mean over events of [sum over CPs of max(0, N_assigned - 1)].
+
+    Counts how many extra tracksters are assigned to each CP beyond the first.
+    This is zero when each CP has exactly one trackster — regardless of whether
+    that means 2 total (ee event) or 3 total (pion with CEE+CHE components,
+    each cleanly assigned to separate CPs).
+    """
+    per_event = []
+    for result in events_results:
+        if result['infeasible']:
+            return np.inf
+        cp_counts = {}
+        for _, (best_cp_id, _) in result['assignments'].items():
+            cp_counts[best_cp_id] = cp_counts.get(best_cp_id, 0) + 1
+        excess = sum(max(0, count - 1) for count in cp_counts.values())
+        per_event.append(float(excess))
+    return float(np.mean(per_event))
 
 
 # ── Public factory ─────────────────────────────────────────────────────────────
 
-def make_objective_fn(raw, df_lc, lc_energy_lookup, baseline_metrics,
-                      particle_types=None, alpha=None, lam=None):
+def make_objective(events):
     """
-    Build the multi-objective callable for patatune.
+    Build the multi-objective callable for joint CEE+CHE optimisation.
+
+    Parameters
+    ----------
+    events : list of per-event dicts from data.load_events()
 
     Returns
     -------
     objective_fn : callable
-        x = [dc, rhoc, do, ds, wz]  →  [purity_delta, energy_ratio, count_delta]
-        Directions: minimize, maximize, minimize
+        params[0:5]  = [density_radius, min_density, outlier_distance,
+                        seeding_distance, w_z]  for CEE
+        params[5:10] = same five parameters      for CHE
+        returns [F1, F2, F3] — all three minimised
     """
-    if particle_types is None:
-        particle_types = PARTICLE_TYPES
-    if alpha is None:
-        alpha = ALPHA
-    if lam is None:
-        lam = LAMBDA
+    def objective_fn(params):
+        cee_params = params[:5]   # density_radius, min_density, outlier_distance,
+        che_params = params[5:]   # seeding_distance, w_z  — same layout for CHE
 
-    weights          = {p: (alpha if p == 'em' else 1.0 - alpha) for p in particle_types}
-    truth_lc_by_eid  = _group_truth_lcs(df_lc)
+        events_results = []
+        for event in events:
+            # Run CLUEstering separately in each subdetector
+            tracksters = []
+            for subdet, subdet_params in zip(SUBDETS, [cee_params, che_params]):
+                lcs = filter_lcs_by_subdet(event['all_lcs'], subdet)
+                if len(lcs['indexes']) == 0:
+                    continue   # this subdetector has no LCs in this event
+                tracksters.extend(
+                    run_cluestering(lcs, *subdet_params)
+                )
 
-    def objective_fn(x):
-        scores = _run_and_score(x, raw, truth_lc_by_eid, lc_energy_lookup, particle_types)
+            # Score globally — tracksters from CEE and CHE pooled together
+            n          = len(tracksters)
+            infeasible = n < 2
 
-        # f1: purity improvement — minimise (negative = better than CLUE3D)
-        d1 = sum(
-            weights[p] * _delta(scores[p]['L1'], baseline_metrics[p]['L1'])
-            for p in particle_types
-        )
+            assignments = (
+                {}
+                if infeasible
+                else assign_tracksters_to_cps(tracksters, event['sim_showers'])
+            )
 
-        # f2: energy recovery — maximise (raw ratio, patatune handles direction)
-        r_combined = sum(weights[p] * scores[p]['r'] for p in particle_types)
+            events_results.append({
+                'infeasible':   infeasible,
+                'n_tracksters': n,
+                'tracksters':   tracksters,
+                'assignments':  assignments,
+                'sim_showers':  event['sim_showers'],
+            })
 
-        # f3: trackster count + floor penalty — minimise
-        mean_NT = sum(weights[p] * scores[p]['NT'] for p in particle_types)
-        d3 = sum(
-            weights[p] * _delta(scores[p]['NT'], baseline_metrics[p]['NT'])
-            for p in particle_types
-        )
-        penalty = lam * max(0.0, 2.0 - mean_NT) ** 2
+        if not events_results or any(r['infeasible'] for r in events_results):
+            return [np.inf, np.inf, np.inf]
 
-        return [d1, r_combined, d3 + penalty]
+        f1 = _objective_purity(events_results)
+        f2 = _objective_efficiency(events_results)
+        f3 = _objective_fragmentation(events_results)
+        return [f1, f2, f3]
 
     return objective_fn
