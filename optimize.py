@@ -99,8 +99,9 @@ def _save_csv(pareto):
     header = PARAM_NAMES + _OBJ_NAMES
     rows   = [[*sol.position, *sol.objectives] for sol in pareto]
     with open('pareto_front.csv', 'w', newline='') as f:
-        csv.writer(f).writerow(header)
-        csv.writer(f).writerows(rows)
+        w = csv.writer(f)
+        w.writerow(header)
+        w.writerows(rows)
     print(f"  pareto_front.csv  ({len(rows)} solutions)")
 
 

@@ -8,24 +8,22 @@ came from.
 
 Three objectives — all minimised:
 
-  F1  purity      mean over events of [max RecoToSim score across all tracksters]
-                  0 = every trackster is perfectly pure
-                  1 = every trackster is entirely contaminated
+  F1  purity        mean over events of [max RecoToSim score across all tracksters]
+                    0 = every trackster is perfectly pure
+                    1 = every trackster is entirely contaminated
 
-  F2  efficiency  mean over events of [1 - min(CP efficiency across both CPs)]
-                  0 = both CPs fully recovered
-                  1 = at least one CP entirely lost
+  F2  efficiency    mean over events of [1 - min(CP efficiency)]
+                    Efficiency = energy recovered across ALL tracksters assigned
+                    to a CP (summing CEE and CHE contributions) / full CP true energy.
+                    0 = both CPs fully recovered,  1 = at least one CP entirely lost
 
-  F3  fragmentation  mean over events of [extra tracksters assigned to same CP]
-                  = sum over CPs of max(0, N_tracksters_assigned - 1)
-                  0 = each CP has exactly one trackster (ideal)
-                  1+ = CPs are being split — e.g. a pion's CEE and CHE portions
-                       are two separate tracksters both assigned to the same CP
-
-  Note on F3: a pion event naturally produces 3 tracksters (1 electron in CEE,
-  1 pion-CEE portion, 1 pion-CHE portion).  Penalising N_total > 2 would punish
-  a perfect reconstruction.  Fragmentation counts extra tracksters *per CP*,
-  which is zero for that 3-trackster case if each is cleanly assigned.
+  F3  fragmentation mean over events of [extra tracksters per (CP, subdetector) pair]
+                    Counts how many tracksters beyond 1 are assigned to the same CP
+                    *within the same subdetector*.
+                    0 = ideal (each CP has at most 1 trackster per subdetector region)
+                    A pion with 1 CEE trackster + 1 CHE trackster scores 0, not 1,
+                    because these are in different subdetectors — that is expected.
+                    A pion whose CEE portion splits into 2 CEE tracksters scores 1.
 
 Infeasibility: if total tracksters (CEE + CHE combined) < 2 in any event,
                return (inf, inf, inf).
@@ -62,7 +60,8 @@ def run_cluestering(lcs, density_radius, min_density,
 
     Returns
     -------
-    tracksters : list of dicts, each with 'lc_indexes' and 'lc_energies'
+    tracksters : list of dicts with 'lc_indexes', 'lc_energies'
+        (subdet tag is added by make_objective, not here)
     """
     if clue is None:
         raise ImportError("CLUEstering is not installed in this environment")
@@ -70,7 +69,7 @@ def run_cluestering(lcs, density_radius, min_density,
     data = pd.DataFrame({
         'x0':     lcs['x'],
         'x1':     lcs['y'],
-        'x2':     lcs['z'] * float(w_z),   # z axis scaled by w_z
+        'x2':     lcs['z'] * float(w_z),
         'weight': lcs['energy'],
     })
 
@@ -88,7 +87,7 @@ def run_cluestering(lcs, density_radius, min_density,
 
 
 def _extract_tracksters(cluster_ids, lcs):
-    """Convert cluster_id array to list of trackster dicts. Outliers (id -1) are dropped."""
+    """Convert cluster_id array to list of trackster dicts. Outliers (id -1) dropped."""
     tracksters = []
     for cid in np.unique(cluster_ids):
         if cid == -1:
@@ -102,7 +101,7 @@ def _extract_tracksters(cluster_ids, lcs):
 
 
 def filter_lcs_by_subdet(all_lcs, subdet):
-    """Return the subset of all_lcs whose subdet label matches."""
+    """Return the subset of all_lcs whose subdet label matches ('CEE' or 'CHE')."""
     mask = all_lcs['subdet'] == subdet
     return {
         'indexes': all_lcs['indexes'][mask],
@@ -135,8 +134,7 @@ def reco_to_sim_score(trackster_lc_indexes, trackster_lc_energies, cp_lc_index_s
 def assign_tracksters_to_cps(tracksters, sim_showers):
     """
     Assign each trackster to the CP that minimises its RecoToSim score.
-    CP LC index sets span both CEE and CHE — the trackster just needs to
-    share LCs with the right CP regardless of subdetector.
+    CP LC index sets span both CEE and CHE.
 
     Returns
     -------
@@ -188,8 +186,7 @@ def _objective_efficiency(events_results):
     F2: mean over events of (1 - min CP efficiency).
 
     CP efficiency = total energy recovered across ALL tracksters assigned to it
-                    (summing CEE and CHE tracksters together)
-                    / CP true_energy (which already spans both subdetectors).
+                    (CEE + CHE tracksters summed) / full CP true_energy.
     """
     per_event = []
     for result in events_results:
@@ -218,21 +215,26 @@ def _objective_efficiency(events_results):
 
 def _objective_fragmentation(events_results):
     """
-    F3: mean over events of [sum over CPs of max(0, N_assigned - 1)].
+    F3: mean over events of extra tracksters per (CP, subdetector) pair.
 
-    Counts how many extra tracksters are assigned to each CP beyond the first.
-    This is zero when each CP has exactly one trackster — regardless of whether
-    that means 2 total (ee event) or 3 total (pion with CEE+CHE components,
-    each cleanly assigned to separate CPs).
+    For each (CP, subdetector) combination, count how many tracksters were
+    assigned to that CP from that subdetector.  Any count > 1 is excess.
+
+    This means:
+    - Electron with 1 CEE trackster              → 0  (ideal)
+    - Pion with 1 CEE trackster + 1 CHE trackster → 0  (expected — spans both regions)
+    - Pion with 2 CEE tracksters + 1 CHE trackster → 1  (CEE over-split)
     """
     per_event = []
     for result in events_results:
         if result['infeasible']:
             return np.inf
-        cp_counts = {}
-        for _, (best_cp_id, _) in result['assignments'].items():
-            cp_counts[best_cp_id] = cp_counts.get(best_cp_id, 0) + 1
-        excess = sum(max(0, count - 1) for count in cp_counts.values())
+        cp_subdet_counts = {}
+        for t_id, (best_cp_id, _) in result['assignments'].items():
+            subdet = result['tracksters'][t_id].get('subdet', 'unknown')
+            key    = (best_cp_id, subdet)
+            cp_subdet_counts[key] = cp_subdet_counts.get(key, 0) + 1
+        excess = sum(max(0, count - 1) for count in cp_subdet_counts.values())
         per_event.append(float(excess))
     return float(np.mean(per_event))
 
@@ -256,31 +258,28 @@ def make_objective(events):
         returns [F1, F2, F3] — all three minimised
     """
     def objective_fn(params):
-        cee_params = params[:5]   # density_radius, min_density, outlier_distance,
-        che_params = params[5:]   # seeding_distance, w_z  — same layout for CHE
+        cee_params = params[:5]
+        che_params = params[5:]
 
         events_results = []
         for event in events:
-            # Run CLUEstering separately in each subdetector
             tracksters = []
             for subdet, subdet_params in zip(SUBDETS, [cee_params, che_params]):
                 lcs = filter_lcs_by_subdet(event['all_lcs'], subdet)
                 if len(lcs['indexes']) == 0:
-                    continue   # this subdetector has no LCs in this event
-                tracksters.extend(
-                    run_cluestering(lcs, *subdet_params)
-                )
+                    continue
+                new_tracksters = run_cluestering(lcs, *subdet_params)
+                for t in new_tracksters:
+                    t['subdet'] = subdet   # tag with origin for fragmentation metric
+                tracksters.extend(new_tracksters)
 
-            # Score globally — tracksters from CEE and CHE pooled together
             n          = len(tracksters)
             infeasible = n < 2
-
             assignments = (
                 {}
                 if infeasible
                 else assign_tracksters_to_cps(tracksters, event['sim_showers'])
             )
-
             events_results.append({
                 'infeasible':   infeasible,
                 'n_tracksters': n,
