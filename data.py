@@ -169,7 +169,10 @@ def _build_event(arrays, event_idx, particle_type):
     all_y = coords_all[:, 1]
     all_z = coords_all[:, 2]
     all_e = coords_all[:, 3]
-    subdet = np.where(np.abs(all_z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+
+    # ── 2-way subdetector assignment ──────────────────────────────────────────
+    abs_z  = np.abs(all_z)
+    subdet = np.where(abs_z < CEE_Z_BOUNDARY, 'CEE', 'CHE')
 
     return {
         'particle_type': particle_type,

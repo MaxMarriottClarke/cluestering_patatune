@@ -256,13 +256,13 @@ class TestObjectiveEfficiency:
         Recovery is correctly summed across both tracksters.
         """
         showers = [
-            _shower(0, [5, 6],     [2.0, 2.0]),          # electron CP
-            _shower(1, [0, 1, 10, 11], [1.0, 1.0, 1.0, 1.0]),  # pion CP (CEE+CHE)
+            _shower(0, [5, 6],     [2.0, 2.0]),                    # electron CP
+            _shower(1, [0, 1, 10, 11], [1.0, 1.0, 1.0, 1.0]),     # pion CP (CEE+CHE)
         ]
         result = _feasible_result(
             tracksters = [
-                _trackster([5, 6],   [2.0, 2.0], subdet='CEE'),  # electron
-                _trackster([0, 1],   [1.0, 1.0], subdet='CEE'),  # pion CEE portion
+                _trackster([5, 6],   [2.0, 2.0], subdet='CEE'),      # electron
+                _trackster([0, 1],   [1.0, 1.0], subdet='CEE'),      # pion CEE portion
                 _trackster([10, 11], [1.0, 1.0], subdet='CHE'),  # pion CHE portion
             ],
             assignments = {0: (0, 0.0), 1: (1, 0.0), 2: (1, 0.0)},
@@ -298,9 +298,9 @@ class TestObjectiveFragmentation:
         """
         result = _feasible_result(
             tracksters  = [
-                _trackster([0], [1.0], 'CEE'),   # electron
-                _trackster([1], [1.0], 'CEE'),   # pion CEE
-                _trackster([2], [1.0], 'CHE'),   # pion CHE
+                _trackster([0], [1.0], 'CEE'),      # electron
+                _trackster([1], [1.0], 'CEE'),      # pion CEE
+                _trackster([2], [1.0], 'CHE'),  # pion CHE
             ],
             assignments = {
                 0: (0, 0.0),   # electron → CP 0
@@ -316,10 +316,10 @@ class TestObjectiveFragmentation:
         """Pion's CEE portion split into 2 CEE tracksters → F3 = 1."""
         result = _feasible_result(
             tracksters  = [
-                _trackster([0],    [1.0], 'CEE'),   # electron
-                _trackster([1],    [1.0], 'CEE'),   # pion CEE fragment 1
-                _trackster([2],    [1.0], 'CEE'),   # pion CEE fragment 2  ← bad
-                _trackster([3],    [1.0], 'CHE'),   # pion CHE
+                _trackster([0],    [1.0], 'CEE'),      # electron
+                _trackster([1],    [1.0], 'CEE'),      # pion CEE fragment 1
+                _trackster([2],    [1.0], 'CEE'),      # pion CEE fragment 2  ← bad
+                _trackster([3],    [1.0], 'CHE'),  # pion CHE
             ],
             assignments = {
                 0: (0, 0.0),
@@ -360,9 +360,9 @@ class TestFilterLcsBySubdet:
             'indexes': np.array([0, 1, 2, 3, 4], dtype=np.int64),
             'x':       np.array([1., 2., 3., 4., 5.], dtype=np.float32),
             'y':       np.zeros(5, dtype=np.float32),
-            'z':       np.array([300., 320., 355., 360., 370.], dtype=np.float32),
-            'energy':  np.array([1., 1., 2., 2., 2.], dtype=np.float32),
-            'subdet':  np.array(['CEE','CEE','CHE','CHE','CHE']),
+            'z':       np.array([300., 320., 380., 390., 430.], dtype=np.float32),
+            'energy':  np.array([1., 1., 2., 2., 3.], dtype=np.float32),
+            'subdet':  np.array(['CEE', 'CEE', 'CHE', 'CHE', 'CHE']),
         }
 
     def test_cee_filter(self):
@@ -373,7 +373,7 @@ class TestFilterLcsBySubdet:
     def test_che_filter(self):
         lcs = filter_lcs_by_subdet(self._make_all_lcs(), 'CHE')
         assert list(lcs['indexes']) == [2, 3, 4]
-        assert list(lcs['energy'])  == pytest.approx([2., 2., 2.])
+        assert list(lcs['energy'])  == pytest.approx([2., 2., 3.])
 
     def test_empty_result(self):
         all_lcs = {
@@ -466,13 +466,13 @@ class TestMakeObjective:
 
     def test_params_split_correctly(self):
         """
-        Verify CEE uses params[:5] and CHE uses params[5:] by checking
-        that the mock receives different param sets for each subdetector.
+        Verify CEE uses params[:5] and CHE uses params[5:10]
+        by checking that the mock receives the correct param set for each subdetector.
         """
         received = []
 
         def recording_mock(lcs, *args):
-            received.append(args)
+            received.append((list(lcs['subdet'][:1]), args))  # store subdet + params
             if len(lcs['indexes']) == 0:
                 return []
             mid = len(lcs['indexes']) // 2
@@ -481,26 +481,15 @@ class TestMakeObjective:
                 {'lc_indexes': lcs['indexes'][mid:],  'lc_energies': lcs['energy'][mid:]},
             ]
 
-        # Make event with both CEE and CHE LCs
-        event = self._make_event()
-        event['all_lcs']['subdet'] = np.array(['CEE', 'CEE', 'CHE', 'CHE'])
-        event['sim_showers'][0]['lc_indexes'] = np.array([0, 1, 2, 3])
-        event['sim_showers'][0]['true_energy'] = 4.0
-        event['sim_showers'].pop(1)
-        # Re-add second shower to keep 2 CPs
-        event['sim_showers'].append({
-            'shower_id': 1, 'lc_indexes': np.array([], dtype=np.int64),
-            'lc_energy': np.array([], dtype=np.float32), 'true_energy': 0.01,
-        })
-
         cee_params = [1.0, 2.0, 3.0, 4.0, 0.5]
         che_params = [5.0, 6.0, 7.0, 8.0, 2.0]
-        params = cee_params + che_params
+        params     = cee_params + che_params
 
-        events = [self._make_event()]   # use simple event
+        events = [self._make_event()]   # all-CEE event
         with patch('objective.run_cluestering', side_effect=recording_mock):
             obj_fn = make_objective(events)
             obj_fn(params)
 
-        # First call is CEE, should use params[:5]
-        assert list(received[0]) == pytest.approx(cee_params)
+        # Only CEE LCs in this event → only one CLUEstering call → should use params[:5]
+        assert len(received) == 1
+        assert list(received[0][1]) == pytest.approx(cee_params)

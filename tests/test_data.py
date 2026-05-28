@@ -19,6 +19,11 @@ from config import CEE_Z_BOUNDARY
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
+def _assign_subdet(all_z):
+    """Replicate the 2-way subdet logic from data._build_event."""
+    return np.where(np.abs(all_z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+
+
 def _make_event(particle_type='ee',
                 shower0_idxs=None, shower0_energies=None,
                 shower1_idxs=None, shower1_energies=None,
@@ -34,7 +39,7 @@ def _make_event(particle_type='ee',
     if all_z is None:
         all_z = np.full(n, 320.0, dtype=np.float32)   # all in CEE by default
 
-    subdet = np.where(np.abs(all_z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+    subdet = _assign_subdet(all_z[:n])
 
     def _shower(sid, idxs, energies):
         e = np.array(energies, dtype=np.float32)
@@ -102,10 +107,9 @@ class TestValidateEvents:
         validate_events(events)   # should not raise
 
     def test_che_lcs_accepted(self):
-        """LCs with |z| >= 352 should be labelled CHE without error."""
-        z_vals = np.array([360.0, 365.0, 370.0, 375.0], dtype=np.float32)
+        """LCs in hadronic region (|z| >= CEE_Z_BOUNDARY) are labelled CHE."""
+        z_vals = np.array([368.0, 380.0, 395.0, 405.0], dtype=np.float32)
         event  = _make_event(all_z=z_vals)
-        # subdet should be all CHE
         assert all(s == 'CHE' for s in event['all_lcs']['subdet'])
         validate_events([event])
 
@@ -113,22 +117,26 @@ class TestValidateEvents:
 # ── Subdetector boundary ───────────────────────────────────────────────────────
 
 class TestSubdetBoundary:
-    """Tests that the CEE/CHE z boundary is applied correctly."""
+    """Tests that the two-way CEE / CHE assignment is correct."""
 
     def test_cee_boundary(self):
-        z = np.array([0., 100., 351.9], dtype=np.float32)
-        subdet = np.where(np.abs(z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+        """z values well below CEE_Z_BOUNDARY → all CEE."""
+        subdet = _assign_subdet(np.array([0., 100., 360.]))
         assert all(s == 'CEE' for s in subdet)
 
     def test_che_boundary(self):
-        z = np.array([352.0, 360.0, 400.0], dtype=np.float32)
-        subdet = np.where(np.abs(z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+        """z values at or above CEE_Z_BOUNDARY → all CHE."""
+        subdet = _assign_subdet(np.array([368.0, 390.0, 430.0]))
         assert all(s == 'CHE' for s in subdet)
+
+    def test_boundary_exact(self):
+        """LC at exactly CEE_Z_BOUNDARY goes to CHE (>= boundary)."""
+        subdet = _assign_subdet(np.array([CEE_Z_BOUNDARY]))
+        assert subdet[0] == 'CHE'
 
     def test_negative_z(self):
         """Boundary is symmetric — negative z side treated identically."""
-        z = np.array([-320., -360.], dtype=np.float32)
-        subdet = np.where(np.abs(z) < CEE_Z_BOUNDARY, 'CEE', 'CHE')
+        subdet = _assign_subdet(np.array([-320., -380.]))
         assert subdet[0] == 'CEE'
         assert subdet[1] == 'CHE'
 

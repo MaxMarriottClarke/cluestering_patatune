@@ -1,0 +1,19 @@
+# HTCondor submit file for CLUEstering parameter optimisation
+#
+# Submit:   condor_submit condor.sub
+# Monitor:  condor_q
+#           tail -f logs/job.out
+
+executable = run.sh
+output     = logs/job.out
+error      = logs/job.err
+log        = logs/job.log
+
+request_cpus   = 8
+request_memory = 8 GB
+request_disk   = 2 GB
+
+# workday = 8h. With 8 CPUs and 1000 events: ~6.5h.
++JobFlavour = "workday"
+
+queue 1
