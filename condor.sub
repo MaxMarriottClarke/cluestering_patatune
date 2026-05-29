@@ -14,6 +14,6 @@ request_memory = 8 GB
 request_disk   = 2 GB
 
 # workday = 8h. With 8 CPUs and 1000 events: ~6.5h.
-+JobFlavour = "workday"
++JobFlavour = "tomorrow"
 
 queue 1

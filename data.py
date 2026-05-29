@@ -6,7 +6,7 @@ and electron-pion events — and interleaves them into a single event list.
 
 Each event is represented as:
     {
-        "particle_type": "ee" | "epion",
+        "particle_type": "ee" | "pi",
         "sim_showers": [
             {
                 "shower_id":   int,
@@ -54,12 +54,12 @@ def _highest_cycle(file, branch_name):
 
 def load_events(data_dir=None, files=None, truth_branch=None, branches=None):
     """
-    Load, resolve and interleave events from the ee and epion ROOT files.
+    Load, resolve and interleave events from the ee and pi ROOT files.
 
     Returns
     -------
-    events : list of per-event dicts (alternating ee / epion)
-        [ee_0, epion_0, ee_1, epion_1, ...]
+    events : list of per-event dicts (alternating ee / pi)
+        [ee_0, pi_0, ee_1, pi_0, ...]
     """
     if data_dir    is None: data_dir     = DATA_DIR
     if files       is None: files        = FILES
@@ -80,7 +80,7 @@ def load_events(data_dir=None, files=None, truth_branch=None, branches=None):
 
     events = []
     for ev_idx in range(n_events):
-        for ptype in ('ee', 'epion'):          # fixed order for reproducibility
+        for ptype in ('ee', 'pi'):          # fixed order for reproducibility
             events.append(_build_event(raw[ptype], ev_idx, ptype))
 
     return events

@@ -1,0 +1,1902 @@
+[
+  {
+    "params": {
+      "density_radius_cee": 3.6424114474148928,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.220396408058082,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 5.786435705350856,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 3.4431212901472605,
+      "seeding_distance_che": 7.263782925801069,
+      "w_z_che": 0.42436131928244153
+    },
+    "objectives": {
+      "F1_purity": 0.3159574151626571,
+      "F2_efficiency_deficit": 0.22877429661736942,
+      "F3_fragmentation": 11.913
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.643383630919626,
+      "min_density_cee": 3.0149706544069494,
+      "outlier_distance_cee": 3.9298364586377437,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 2.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 14.940875100952923,
+      "w_z_che": 1.0
+    },
+    "objectives": {
+      "F1_purity": 0.22207600403496322,
+      "F2_efficiency_deficit": 0.3077452202946929,
+      "F3_fragmentation": 6.615
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.512538268318386,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7262732597543475,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.590056104395263,
+      "seeding_distance_che": 2.71017536839471,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3912172009807733,
+      "F2_efficiency_deficit": 0.1754647833317034,
+      "F3_fragmentation": 39.491
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.622106062802274,
+      "min_density_cee": 3.009352358922545,
+      "outlier_distance_cee": 7.822250211514383,
+      "seeding_distance_cee": 3.00659763196018,
+      "w_z_cee": 0.7195443736707499,
+      "density_radius_che": 3.7578476486315058,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.430298933560497,
+      "seeding_distance_che": 3.1743788818934915,
+      "w_z_che": 0.42272445835472594
+    },
+    "objectives": {
+      "F1_purity": 0.26533817522744335,
+      "F2_efficiency_deficit": 0.2514888710038779,
+      "F3_fragmentation": 8.006
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.896203362877164,
+      "min_density_cee": 3.142685621376764,
+      "outlier_distance_cee": 7.505315894147278,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6524229933766564,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.14990058973288,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.36377457280017417,
+      "F2_efficiency_deficit": 0.19704521544227552,
+      "F3_fragmentation": 25.597
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7380161099742937,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3434748163011237,
+      "F2_efficiency_deficit": 0.1795647207361493,
+      "F3_fragmentation": 40.338
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7593349101408293,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.643377393671638,
+      "seeding_distance_cee": 3.000947504788569,
+      "w_z_cee": 0.6,
+      "density_radius_che": 7.955186290697016,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.8044067435335265,
+      "seeding_distance_che": 3.924913888743803,
+      "w_z_che": 0.4035011517162918
+    },
+    "objectives": {
+      "F1_purity": 0.3425127129828139,
+      "F2_efficiency_deficit": 0.22321447136198083,
+      "F3_fragmentation": 13.32
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.760178842846779,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.706228011261658,
+      "seeding_distance_cee": 3.000770344130322,
+      "w_z_cee": 0.6,
+      "density_radius_che": 6.894642075844296,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.891898928684752,
+      "seeding_distance_che": 5.8340060916819105,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3163952505844206,
+      "F2_efficiency_deficit": 0.26042880443226785,
+      "F3_fragmentation": 6.72
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.063119452422763,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.67484903063499,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.555050903450687,
+      "seeding_distance_che": 2.820108335865955,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3726861496933267,
+      "F2_efficiency_deficit": 0.1822170586759916,
+      "F3_fragmentation": 33.163
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.64515282532472,
+      "min_density_cee": 3.010211133861166,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.8001816407722624,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.211965985837241,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.32159558454320986,
+      "F2_efficiency_deficit": 0.2036977275964907,
+      "F3_fragmentation": 23.305
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.323900898094985,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.000380939593201,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.057691691812417,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3749399648985669,
+      "F2_efficiency_deficit": 0.174714053022074,
+      "F3_fragmentation": 42.922
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7159806667337634,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7056130346662006,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.96238051941473,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.33396204787047845,
+      "F2_efficiency_deficit": 0.18041206640986948,
+      "F3_fragmentation": 40.685
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.0261116836197015,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.725733410806997,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6270279602611362,
+      "density_radius_che": 7.765714888751605,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 10.644655794541869,
+      "seeding_distance_che": 3.5154316472157405,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.36399817575697657,
+      "F2_efficiency_deficit": 0.20538292334358915,
+      "F3_fragmentation": 18.563
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5934417653595796,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.950116862437369,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.698595485216774,
+      "density_radius_che": 7.077075318419998,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.00366486835664,
+      "seeding_distance_che": 2.5999514824644994,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.31616693701886855,
+      "F2_efficiency_deficit": 0.19540655060614692,
+      "F3_fragmentation": 32.269
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.746096714001994,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.513931755098361,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35046588071386636,
+      "F2_efficiency_deficit": 0.20845508618791017,
+      "F3_fragmentation": 17.977
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.333797005056304,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 4.0077114915714045,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.36856905942890544,
+      "F2_efficiency_deficit": 0.21628186632270618,
+      "F3_fragmentation": 15.184
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5674508030210923,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7588913260290397,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.7751914370093145,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3104950105048233,
+      "F2_efficiency_deficit": 0.1906300214626404,
+      "F3_fragmentation": 32.318
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6699866808669195,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.000031493375851,
+      "w_z_cee": 0.6579333571853149,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.936918243754727,
+      "seeding_distance_che": 2.5577631634241467,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.33000465908535637,
+      "F2_efficiency_deficit": 0.18342295847521267,
+      "F3_fragmentation": 38.845
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7170867543558983,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6716515719899339,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 4.147374158425492,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.32798000275476635,
+      "F2_efficiency_deficit": 0.22956570125169173,
+      "F3_fragmentation": 11.441
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.069702760030656,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.260133000475246,
+      "seeding_distance_cee": 3.0000157330519817,
+      "w_z_cee": 0.6218758208710987,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.283577326603755,
+      "seeding_distance_che": 2.9660477873325584,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3702902104383519,
+      "F2_efficiency_deficit": 0.18741638873353358,
+      "F3_fragmentation": 29.514
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.172065130169741,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.92816492201088,
+      "seeding_distance_cee": 3.000027139772825,
+      "w_z_cee": 0.6319053608182021,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 5.363816951584763,
+      "seeding_distance_che": 3.0636302896601735,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.37550785008368454,
+      "F2_efficiency_deficit": 0.18763079420077117,
+      "F3_fragmentation": 28.298
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.731345714956916,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 7.5539609225688755,
+      "seeding_distance_cee": 3.000089937972038,
+      "w_z_cee": 0.7183330960800336,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 7.493121263781109,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3925703170199363,
+      "F2_efficiency_deficit": 0.17181265137765453,
+      "F3_fragmentation": 45.939
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6420497729944,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.001852678233215,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.2894570730557797,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.33784806591440214,
+      "F2_efficiency_deficit": 0.20404850112611964,
+      "F3_fragmentation": 21.23
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.25763793651392,
+      "min_density_cee": 3.021691768672621,
+      "outlier_distance_cee": 6.261151212855827,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6447949573793991,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.76932664528223,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3767295927106593,
+      "F2_efficiency_deficit": 0.17810489571191543,
+      "F3_fragmentation": 35.599
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7782106749611337,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.724413973667729,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35177537764311506,
+      "F2_efficiency_deficit": 0.1829249413898243,
+      "F3_fragmentation": 34.437
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.8180453518210005,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.87354721365496,
+      "seeding_distance_cee": 3.000461867741714,
+      "w_z_cee": 0.6,
+      "density_radius_che": 7.898179506053333,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.689835491976075,
+      "seeding_distance_che": 3.194813531035928,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35765865857636664,
+      "F2_efficiency_deficit": 0.19708430873585778,
+      "F3_fragmentation": 23.814
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.38349961401948,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.038189624101559,
+      "seeding_distance_cee": 3.0002298442674094,
+      "w_z_cee": 0.694814927241665,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.4201804192816887,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.38590228183382863,
+      "F2_efficiency_deficit": 0.19461144532577682,
+      "F3_fragmentation": 23.612
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.133616045411827,
+      "min_density_cee": 3.0019461683832507,
+      "outlier_distance_cee": 8.66724039459353,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7405605339706881,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.5123305489115624,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3781274140230359,
+      "F2_efficiency_deficit": 0.20468590923560823,
+      "F3_fragmentation": 20.934
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.453488435224082,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6887783039870992,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.20564402730514,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3847804846989211,
+      "F2_efficiency_deficit": 0.17270004460399485,
+      "F3_fragmentation": 44.318
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.860968592675917,
+      "min_density_cee": 3.0095042639204563,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0002180375015257,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.134143152321087,
+      "seeding_distance_che": 3.313125116880408,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35693084274810555,
+      "F2_efficiency_deficit": 0.19767027696324863,
+      "F3_fragmentation": 21.972
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7486459449814897,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.860644884482221,
+      "seeding_distance_che": 2.7989644562881493,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3501792634567242,
+      "F2_efficiency_deficit": 0.18754602460974387,
+      "F3_fragmentation": 31.81
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.000059925916967,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.677602667754154,
+      "seeding_distance_cee": 3.0001668544799367,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 10.614088632802256,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3579381058559094,
+      "F2_efficiency_deficit": 0.17681765362393123,
+      "F3_fragmentation": 41.511
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.764115390380755,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0011110486207397,
+      "w_z_cee": 0.6,
+      "density_radius_che": 6.939118874488333,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 9.336466225210899,
+      "seeding_distance_che": 3.888737482858769,
+      "w_z_che": 0.4092213568596671
+    },
+    "objectives": {
+      "F1_purity": 0.33831230473325014,
+      "F2_efficiency_deficit": 0.2307406280859282,
+      "F3_fragmentation": 11.231
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7163549687165824,
+      "min_density_cee": 3.0018284238744535,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6022848486206949,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.304982136778568,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3421350201893862,
+      "F2_efficiency_deficit": 0.18034801698260192,
+      "F3_fragmentation": 40.234
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5788244965933007,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7281434926167867,
+      "density_radius_che": 2.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.19733560616414766,
+      "F2_efficiency_deficit": 0.30706523700269855,
+      "F3_fragmentation": 6.674
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.853456993551676,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.000249077389924,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.3352322913075145,
+      "seeding_distance_che": 2.7285726458222967,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35558045390594983,
+      "F2_efficiency_deficit": 0.18127134242414367,
+      "F3_fragmentation": 34.665
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5599481183925334,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0001076674369958,
+      "w_z_cee": 0.6907557492625933,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 8.300635319173084,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.31009031088307054,
+      "F2_efficiency_deficit": 0.18409941618993256,
+      "F3_fragmentation": 39.655
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5661329322369526,
+      "min_density_cee": 3.0054723246677257,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.702851876340007,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3070602208011355,
+      "F2_efficiency_deficit": 0.18593839296737166,
+      "F3_fragmentation": 39.715
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9044559440678563,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.228380843545144,
+      "seeding_distance_che": 2.697792100092221,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35760514478639494,
+      "F2_efficiency_deficit": 0.18105620883916704,
+      "F3_fragmentation": 35.679
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7538798873872734,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6095644203459769,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 10.54378034218638,
+      "seeding_distance_che": 3.666902413974155,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.34458133698124765,
+      "F2_efficiency_deficit": 0.21042738610785272,
+      "F3_fragmentation": 16.008
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9177086168452866,
+      "min_density_cee": 3.013861306302098,
+      "outlier_distance_cee": 9.284694051535997,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.608204155817592,
+      "density_radius_che": 7.9836125448378485,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.774923323682856,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4267084735551766
+    },
+    "objectives": {
+      "F1_purity": 0.35430454415295826,
+      "F2_efficiency_deficit": 0.17993597976296127,
+      "F3_fragmentation": 40.1
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.5899566925268696,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.672140290654074,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7245094942932561,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.044631072006744,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3942407093154336,
+      "F2_efficiency_deficit": 0.17116079082840577,
+      "F3_fragmentation": 45.55
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.4270806924034023,
+      "min_density_cee": 3.143173413382548,
+      "outlier_distance_cee": 9.539894537013188,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7350074588341796,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.66661872721507,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.28097949129702227,
+      "F2_efficiency_deficit": 0.19140952603006758,
+      "F3_fragmentation": 34.284
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.526325486791299,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.114774567609594,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7292342692877687,
+      "density_radius_che": 5.355727217071683,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.572967286525106,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.43036321656644816
+    },
+    "objectives": {
+      "F1_purity": 0.27902195570881083,
+      "F2_efficiency_deficit": 0.22688778072602372,
+      "F3_fragmentation": 22.049
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.06812288114873,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0002487039293824,
+      "w_z_cee": 0.6496664693533137,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.236007687196656,
+      "seeding_distance_che": 3.4197437646310402,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.37016508281247956,
+      "F2_efficiency_deficit": 0.19981285222810125,
+      "F3_fragmentation": 21.629
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.4292741733740515,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 6.786068657116967,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7064952920975263,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.363857565420972,
+      "seeding_distance_che": 4.4943721720348,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.265695648763666,
+      "F2_efficiency_deficit": 0.25104477290899535,
+      "F3_fragmentation": 7.643
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9995191226589144,
+      "min_density_cee": 3.041467740758471,
+      "outlier_distance_cee": 7.2050791981667235,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.738968432289232,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3600764313851506,
+      "F2_efficiency_deficit": 0.18053561685706757,
+      "F3_fragmentation": 34.893
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.580449633403547,
+      "min_density_cee": 3.0150670055442403,
+      "outlier_distance_cee": 9.430199937426417,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 7.490481549475717,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.770718182619154,
+      "seeding_distance_che": 2.741744529401028,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3254635940873487,
+      "F2_efficiency_deficit": 0.1953957589335261,
+      "F3_fragmentation": 30.043
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.614863286469005,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 6.886847192353732,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6824399166125109,
+      "density_radius_che": 4.660532231153384,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.8017710871182127,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.29667043642569835,
+      "F2_efficiency_deficit": 0.23339243561274406,
+      "F3_fragmentation": 14.214
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.145590571102591,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 7.518986814569065,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6199654257923305,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.774241941569144,
+      "seeding_distance_che": 3.321292998831365,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.37153092732214554,
+      "F2_efficiency_deficit": 0.1976415213225106,
+      "F3_fragmentation": 23.107
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.4911016278156364,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7467149272458684,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.832904884630578,
+      "seeding_distance_che": 3.3414891080363143,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.2981251127120889,
+      "F2_efficiency_deficit": 0.20880049943569706,
+      "F3_fragmentation": 19.905
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.88302618092349,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0003249166201447,
+      "w_z_cee": 0.6941867992914232,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.603311059890348,
+      "seeding_distance_che": 2.992312815690976,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.36110790628045153,
+      "F2_efficiency_deficit": 0.1903383370560045,
+      "F3_fragmentation": 28.655
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6485447754333467,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 7.261104273127122,
+      "seeding_distance_cee": 3.000292977393984,
+      "w_z_cee": 0.63453870698242,
+      "density_radius_che": 7.786056026477516,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.274353149329434,
+      "seeding_distance_che": 3.9328393075058194,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.325469580105037,
+      "F2_efficiency_deficit": 0.2274937504896249,
+      "F3_fragmentation": 12.1
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.004079106480513,
+      "min_density_cee": 3.018555366666597,
+      "outlier_distance_cee": 6.402262278474604,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.629038780183848,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3571845468899228,
+      "F2_efficiency_deficit": 0.17591531398183438,
+      "F3_fragmentation": 41.533
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.094804459686893,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.212366264773344,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6940623553446691,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.2315227133683315,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3729978170782342,
+      "F2_efficiency_deficit": 0.1946476246089049,
+      "F3_fragmentation": 25.088
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5918120099129163,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.6245334367372255,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4154388878749029
+    },
+    "objectives": {
+      "F1_purity": 0.32289219413268333,
+      "F2_efficiency_deficit": 0.18664719961933576,
+      "F3_fragmentation": 38.87
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.064768449537012,
+      "min_density_cee": 3.001807433781505,
+      "outlier_distance_cee": 9.631479126091335,
+      "seeding_distance_cee": 3.00001686538787,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.2850718991485306,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.366284107550696,
+      "F2_efficiency_deficit": 0.19675454167689976,
+      "F3_fragmentation": 23.307
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.58990574008439,
+      "min_density_cee": 3.0004470770984737,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.785381982732645,
+      "seeding_distance_che": 3.7887279265937863,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.32270124768594294,
+      "F2_efficiency_deficit": 0.22016981874159564,
+      "F3_fragmentation": 13.703
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.034543859293809,
+      "min_density_cee": 3.030530723677772,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 3.8205037033453246,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.153756734781474,
+      "seeding_distance_che": 4.218320727056551,
+      "w_z_che": 0.44936800059763543
+    },
+    "objectives": {
+      "F1_purity": 0.2955437374724228,
+      "F2_efficiency_deficit": 0.24709987535498912,
+      "F3_fragmentation": 6.798
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.053679893369453,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.439177313206208,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.616546904659623,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.211153759268806,
+      "seeding_distance_che": 2.5803455648195994,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3642137309655171,
+      "F2_efficiency_deficit": 0.17729173719947852,
+      "F3_fragmentation": 39.902
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5944061235281737,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7137864910017738,
+      "density_radius_che": 3.4188532159328737,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.167916818905651,
+      "seeding_distance_che": 3.0313100308021754,
+      "w_z_che": 0.4580077668927831
+    },
+    "objectives": {
+      "F1_purity": 0.25462300967281903,
+      "F2_efficiency_deficit": 0.26732594043882196,
+      "F3_fragmentation": 8.288
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 2.0575640123214356,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.000008301688877,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.84229986419145,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.17726982094423563,
+      "F2_efficiency_deficit": 0.203015011244071,
+      "F3_fragmentation": 36.608
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.008698890317571,
+      "min_density_cee": 3.001338579391709,
+      "outlier_distance_cee": 8.781675334598116,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 3.957990710919697,
+      "seeding_distance_che": 6.024456558820491,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3527708000699805,
+      "F2_efficiency_deficit": 0.2167844913631664,
+      "F3_fragmentation": 14.116
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.767329674037455,
+      "min_density_cee": 3.083797307013407,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7355428967472868,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.885068690992028,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.34531846218090845,
+      "F2_efficiency_deficit": 0.19107562077695509,
+      "F3_fragmentation": 30.529
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5955717167075463,
+      "min_density_cee": 3.005438505677711,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7341944125775245,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.6923941104648375,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.31597933408373846,
+      "F2_efficiency_deficit": 0.18760695469530744,
+      "F3_fragmentation": 34.736
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.629630666774835,
+      "min_density_cee": 3.00720140375093,
+      "outlier_distance_cee": 8.100953771822457,
+      "seeding_distance_cee": 3.0058597952466215,
+      "w_z_cee": 0.7732884377620204,
+      "density_radius_che": 4.710745617412363,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.404969539373933,
+      "seeding_distance_che": 3.220362035159352,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.28780097498783347,
+      "F2_efficiency_deficit": 0.23632411935363284,
+      "F3_fragmentation": 10.556
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.695760303681115,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 9.994114720188339,
+      "seeding_distance_che": 3.858276160478102,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3360305534388346,
+      "F2_efficiency_deficit": 0.21946240034241865,
+      "F3_fragmentation": 13.704
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9019503941668834,
+      "min_density_cee": 3.0060668830765693,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6038250644845818,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.998455401244634,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35328436607435504,
+      "F2_efficiency_deficit": 0.17866268220120082,
+      "F3_fragmentation": 41.14
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7680635548060684,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6890036902828985,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.3609141208694804,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.34729690716107725,
+      "F2_efficiency_deficit": 0.20045223906051002,
+      "F3_fragmentation": 21.051
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6710410806774743,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.304300106885936,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7042118404085904,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 4.71769059970876,
+      "seeding_distance_che": 3.07608852986678,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3355558327547891,
+      "F2_efficiency_deficit": 0.19649822204950318,
+      "F3_fragmentation": 26.029
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.8227409129284027,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.315664960218207,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6033128989542411,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.634120588762269,
+      "seeding_distance_che": 2.812348151121247,
+      "w_z_che": 0.41274307175109853
+    },
+    "objectives": {
+      "F1_purity": 0.3533552265363061,
+      "F2_efficiency_deficit": 0.18501255824625343,
+      "F3_fragmentation": 32.875
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5705228977695325,
+      "min_density_cee": 3.0038347890869694,
+      "outlier_distance_cee": 7.610477703762154,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7163562793219119,
+      "density_radius_che": 2.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.40968533350788494
+    },
+    "objectives": {
+      "F1_purity": 0.19641976738692288,
+      "F2_efficiency_deficit": 0.3077777625391219,
+      "F3_fragmentation": 6.58
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.84245758205171,
+      "min_density_cee": 3.0200192638366836,
+      "outlier_distance_cee": 9.604150542217779,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.7088001891606206,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35027978177008745,
+      "F2_efficiency_deficit": 0.210447617621754,
+      "F3_fragmentation": 15.861
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.523706137831287,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.775365021725877,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7068989551055973,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3885545003830706,
+      "F2_efficiency_deficit": 0.1721945528707802,
+      "F3_fragmentation": 44.985
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7627168721559037,
+      "min_density_cee": 3.0021858465116926,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6831992307781134,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.7123054180551036,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.34532057414716366,
+      "F2_efficiency_deficit": 0.1813804243771266,
+      "F3_fragmentation": 34.925
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.850665167371829,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.940896048945564,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 3.236058516051445,
+      "seeding_distance_che": 2.8794098821521406,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3561843085676036,
+      "F2_efficiency_deficit": 0.18671731826697827,
+      "F3_fragmentation": 30.496
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.849283094587123,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.955099517908385,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 10.666647265558685,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3499510225155049,
+      "F2_efficiency_deficit": 0.17885777793641314,
+      "F3_fragmentation": 40.913
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.7234538066251988,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.922431869437128,
+      "seeding_distance_cee": 3.03729993008002,
+      "w_z_cee": 0.6,
+      "density_radius_che": 2.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.8145302943186983
+    },
+    "objectives": {
+      "F1_purity": 0.22542105753143435,
+      "F2_efficiency_deficit": 0.3064140832462463,
+      "F3_fragmentation": 6.72
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.973347235360779,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6165181232465992,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 9.799430412767675,
+      "seeding_distance_che": 2.528720091987129,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.35776122425925383,
+      "F2_efficiency_deficit": 0.17861135568561695,
+      "F3_fragmentation": 41.06
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.830466451375828,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.549128881563268,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6221075902801644,
+      "density_radius_che": 7.9274250355423375,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 11.926444748318836,
+      "seeding_distance_che": 3.102822723680499,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3586913045062967,
+      "F2_efficiency_deficit": 0.19451983827579306,
+      "F3_fragmentation": 25.687
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.124249997025595,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.49973545463858,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6219064151267448,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 12.193341077826101,
+      "seeding_distance_che": 2.978262551093847,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3741038428946084,
+      "F2_efficiency_deficit": 0.18441598813973747,
+      "F3_fragmentation": 29.549
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9235584035298032,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.184405824367913,
+      "seeding_distance_che": 3.5224308824254216,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3572201539362902,
+      "F2_efficiency_deficit": 0.20608176918268428,
+      "F3_fragmentation": 18.525
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.043603585641311,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.545685477940777,
+      "seeding_distance_cee": 3.00020768118185,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.1108159563434326,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.36659762622613223,
+      "F2_efficiency_deficit": 0.1916203462099784,
+      "F3_fragmentation": 26.734
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.120021989500566,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.380530135415347,
+      "seeding_distance_cee": 3.000048697242439,
+      "w_z_cee": 0.6969152662908477,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.5,
+      "seeding_distance_che": 5.258916100404966,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.371699250158631,
+      "F2_efficiency_deficit": 0.17587686816938092,
+      "F3_fragmentation": 42.887
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6177709157785327,
+      "min_density_cee": 3.0135669743559736,
+      "outlier_distance_cee": 6.823057128825042,
+      "seeding_distance_cee": 3.008470251351208,
+      "w_z_cee": 0.7508676000857294,
+      "density_radius_che": 2.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 9.49575898799991,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4628160249924882
+    },
+    "objectives": {
+      "F1_purity": 0.20121976287706975,
+      "F2_efficiency_deficit": 0.30640645775947684,
+      "F3_fragmentation": 6.929
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.5866568418962617,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.381102571834958,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 6.627927094474142,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 3.3772953058753536,
+      "seeding_distance_che": 11.583500743441448,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.31893486741547367,
+      "F2_efficiency_deficit": 0.21883914167227986,
+      "F3_fragmentation": 14.423
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.608773632237007,
+      "min_density_cee": 3.020600166082173,
+      "outlier_distance_cee": 8.776385279418452,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7817822532674279,
+      "density_radius_che": 7.402590383055435,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 6.092235285416886,
+      "seeding_distance_che": 2.7972425540297006,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3169771384006924,
+      "F2_efficiency_deficit": 0.19899167668400766,
+      "F3_fragmentation": 28.655
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.580786093826693,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.32137090451821,
+      "F2_efficiency_deficit": 0.18537400156954603,
+      "F3_fragmentation": 39.479
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.4496166839965743,
+      "min_density_cee": 3.0336452497281963,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.000213829788304,
+      "w_z_cee": 0.7250706093912053,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.172737003329698,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.2943101332429336,
+      "F2_efficiency_deficit": 0.20485438338980413,
+      "F3_fragmentation": 22.956
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.8935280018804588,
+      "min_density_cee": 3.003213648949613,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6955561188440235,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 3.025636313457459,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3628696303860701,
+      "F2_efficiency_deficit": 0.1899287772307388,
+      "F3_fragmentation": 28.152
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.430823226617107,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.682447197761652,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6761976975276525,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 14.696144738652007,
+      "seeding_distance_che": 3.714662908768351,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3835960088226269,
+      "F2_efficiency_deficit": 0.2052264330678456,
+      "F3_fragmentation": 19.021
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6211687006382416,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 4.485007274059538,
+      "seeding_distance_cee": 3.002462110823779,
+      "w_z_cee": 0.6427439740335293,
+      "density_radius_che": 3.5485024188063043,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.7845679519572644
+    },
+    "objectives": {
+      "F1_purity": 0.24796984854334386,
+      "F2_efficiency_deficit": 0.2855472523397832,
+      "F3_fragmentation": 9.21
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6224965473506376,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 9.98613813323067,
+      "seeding_distance_cee": 3.001214774937443,
+      "w_z_cee": 0.6092110258810226,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 9.043906364497609,
+      "seeding_distance_che": 4.144465898746681,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.31757249344527266,
+      "F2_efficiency_deficit": 0.23238480246251317,
+      "F3_fragmentation": 10.733
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.9021320699448423,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3535314649150955,
+      "F2_efficiency_deficit": 0.17816717154740572,
+      "F3_fragmentation": 41.131
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.8785228034417534,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 13.658292338843928,
+      "seeding_distance_che": 2.6561092119378014,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3567865757738284,
+      "F2_efficiency_deficit": 0.1810004736312581,
+      "F3_fragmentation": 36.807
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.6882900042906592,
+      "min_density_cee": 3.018933004476961,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6355767895796366,
+      "density_radius_che": 7.640781562690853,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 10.711285175910831,
+      "seeding_distance_che": 3.463664748144316,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3418470417351508,
+      "F2_efficiency_deficit": 0.21026771349834014,
+      "F3_fragmentation": 17.549
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.637532258137332,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6807625906963481,
+      "density_radius_che": 7.804618717852116,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 3.3582939834968735,
+      "seeding_distance_che": 2.929133835787509,
+      "w_z_che": 0.48148514050306473
+    },
+    "objectives": {
+      "F1_purity": 0.32751987023183704,
+      "F2_efficiency_deficit": 0.19369048453352486,
+      "F3_fragmentation": 31.786
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.628701473967366,
+      "min_density_cee": 3.066773246933849,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.6893031502317905,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 15.0,
+      "seeding_distance_che": 2.74867074827491,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3232775340058103,
+      "F2_efficiency_deficit": 0.18522370026391408,
+      "F3_fragmentation": 33.147
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 3.948624303298044,
+      "min_density_cee": 3.0,
+      "outlier_distance_cee": 8.217021982467774,
+      "seeding_distance_cee": 3.000052579247025,
+      "w_z_cee": 0.6389683916631962,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 2.56813917381254,
+      "seeding_distance_che": 5.727251477651464,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.3607994296094118,
+      "F2_efficiency_deficit": 0.17912692430411636,
+      "F3_fragmentation": 39.971
+    }
+  },
+  {
+    "params": {
+      "density_radius_cee": 4.620187876809363,
+      "min_density_cee": 3.014490584188591,
+      "outlier_distance_cee": 10.0,
+      "seeding_distance_cee": 3.0,
+      "w_z_cee": 0.7466915940393873,
+      "density_radius_che": 8.0,
+      "min_density_che": 2.5,
+      "outlier_distance_che": 7.729234012985936,
+      "seeding_distance_che": 2.5,
+      "w_z_che": 0.4
+    },
+    "objectives": {
+      "F1_purity": 0.39493481733172947,
+      "F2_efficiency_deficit": 0.16990013806111334,
+      "F3_fragmentation": 46.008
+    }
+  }
+]

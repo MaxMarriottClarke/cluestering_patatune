@@ -34,29 +34,27 @@ import numpy as np
 import patatune
 
 from config import (
-    PARAM_NAMES, LOWER_BOUNDS, UPPER_BOUNDS, DEFAULT_PARAMS,
+    PARAM_NAMES, OBJ_NAMES, LOWER_BOUNDS, UPPER_BOUNDS, DEFAULT_PARAMS,
     N_EVENTS, N_JOBS,
     NUM_PARTICLES, NUM_ITERATIONS, INERTIA, COGNITIVE, SOCIAL,
     MAX_PARETO, TOPOLOGY, RANDOM_SEED,
-    OUTPUT_DIR,
+    OUTPUT_DIR, CLUE3D_BASELINES,
 )
 from data import load_events, validate_events
 from objective import make_objective
 
-_OBJ_NAMES = ['F1_purity', 'F2_efficiency_deficit', 'F3_fragmentation']
-
 
 def _subsample_events(events, n):
     """
-    Return n events keeping the ee/epion balance exactly 50/50.
-    Events are assumed to be interleaved [ee_0, epion_0, ee_1, ...].
+    Return n events keeping the ee/pi balance exactly 50/50.
+    Events are assumed to be interleaved [ee_0, pi_0, ee_1, ...].
     """
     if n is None or n >= len(events):
         return events
     n = n - (n % 2)   # round down to nearest even number
     ee    = [e for e in events if e['particle_type'] == 'ee'   ][:n // 2]
-    epion = [e for e in events if e['particle_type'] == 'epion'][:n // 2]
-    return [e for pair in zip(ee, epion) for e in pair]
+    pi    = [e for e in events if e['particle_type'] == 'pi'][:n // 2]
+    return [e for pair in zip(ee, pi) for e in pair]
 
 
 def main():
@@ -70,9 +68,9 @@ def main():
 
     events = _subsample_events(all_events, N_EVENTS)
     n_ee    = sum(1 for e in events if e['particle_type'] == 'ee')
-    n_epion = sum(1 for e in events if e['particle_type'] == 'epion')
+    n_pi = sum(1 for e in events if e['particle_type'] == 'pi')
     print(f"Using {len(events)} events for optimisation  "
-          f"({n_ee} ee + {n_epion} epion)\n", flush=True)
+          f"({n_ee} ee + {n_pi} ππ)\n", flush=True)
 
     # ── timing probe (single-process, 20 events) ──────────────────────────────
     print("=== Timing probe ===", flush=True)
@@ -91,8 +89,10 @@ def main():
           f"{t_per_particle:.1f}s per particle")
     print(f"  estimated per iteration : {t_iter / 60:.1f} min  ({NUM_PARTICLES} particles)")
     print(f"  estimated total         : {t_total / 3600:.1f} h  ({NUM_ITERATIONS} iters)")
-    print(f"  probe result            : F1={probe_result[0]:.4f}  "
-          f"F2={probe_result[1]:.4f}  F3={probe_result[2]:.4f}\n", flush=True)
+    _probe_str = "  ".join(
+        f"{n}={v:.4f}" for n, v in zip(OBJ_NAMES, probe_result)
+    )
+    print(f"  probe result            : {_probe_str}\n", flush=True)
 
     # ── build objective (parallel) ─────────────────────────────────────────────
     print(f"Initialising {N_JOBS} worker processes...", flush=True)
@@ -101,15 +101,23 @@ def main():
 
     objective = patatune.ElementWiseObjective(
         obj_fn,
-        num_objectives=3,
-        directions=['minimize', 'minimize', 'minimize'],
-        objective_names=_OBJ_NAMES,
+        num_objectives=6,
+        directions=['minimize'] * 6,
+        objective_names=OBJ_NAMES,
     )
 
     # ── run MOPSO ─────────────────────────────────────────────────────────────
     print(f"=== Running MOPSO ===")
-    print(f"  10 parameters: {PARAM_NAMES[:5]}  (CEE)")
-    print(f"                 {PARAM_NAMES[5:]}  (CHE)")
+    print(f"  10 parameters : {PARAM_NAMES[:5]}  (CEE)")
+    print(f"                  {PARAM_NAMES[5:]}  (CHE)")
+    print(f"   6 objectives : {OBJ_NAMES[:3]}  (ee)")
+    print(f"                  {OBJ_NAMES[3:]}  (e-pi)")
+    print(f"  Each objective = raw metric / CLUE3D baseline  "
+          f"(target < 1.0 = better than CLUE3D)")
+    print(f"  CLUE3D ee    baselines: "
+          + "  ".join(f"{k}={v:.4f}" for k, v in CLUE3D_BASELINES['ee'].items()))
+    print(f"  CLUE3D ππ baselines: "
+          + "  ".join(f"{k}={v:.4f}" for k, v in CLUE3D_BASELINES['pi'].items()))
     print(f"  particles={NUM_PARTICLES}  iterations={NUM_ITERATIONS}\n", flush=True)
 
     patatune.Randomizer.rng = np.random.default_rng(RANDOM_SEED)
@@ -149,19 +157,19 @@ def main():
     print(f"\nDone in {wall_time / 3600:.2f}h — {len(pareto)} Pareto-optimal solutions\n")
 
     # ── print summary ─────────────────────────────────────────────────────────
-    print("=== Pareto front ===")
-    header = PARAM_NAMES + _OBJ_NAMES
-    print("  ".join(f"{h:>24s}" for h in header))
+    print("=== Pareto front (sorted by R1_ee) ===")
+    header = PARAM_NAMES + OBJ_NAMES
+    print("  ".join(f"{h:>22s}" for h in header))
     for sol in sorted(pareto, key=lambda s: s.fitness[0]):
         vals = list(sol.position) + list(sol.fitness)
-        print("  ".join(f"{v:24.6f}" for v in vals))
+        print("  ".join(f"{v:22.6f}" for v in vals))
 
     # ── save ──────────────────────────────────────────────────────────────────
     print(f"\n=== Saving to {OUTPUT_DIR}/ ===")
     _save_csv(pareto)
     _save_json(pareto)
     _save_npy(pareto)
-    _save_run_info(pareto, wall_time, len(events), n_ee, n_epion)
+    _save_run_info(pareto, wall_time, len(events), n_ee, n_pi)
     print("All done.")
 
 
@@ -172,7 +180,7 @@ def _path(filename):
 
 
 def _save_csv(pareto):
-    header = PARAM_NAMES + _OBJ_NAMES
+    header = PARAM_NAMES + OBJ_NAMES
     rows   = [[*sol.position, *sol.fitness] for sol in pareto]
     with open(_path('pareto_front.csv'), 'w', newline='') as f:
         w = csv.writer(f)
@@ -185,7 +193,7 @@ def _save_json(pareto):
     archive = [
         {
             'params':     dict(zip(PARAM_NAMES, sol.position.tolist())),
-            'objectives': dict(zip(_OBJ_NAMES,  sol.fitness.tolist())),
+            'objectives': dict(zip(OBJ_NAMES,   sol.fitness.tolist())),
         }
         for sol in pareto
     ]
@@ -200,20 +208,22 @@ def _save_npy(pareto):
     print("  pareto_positions.npy / pareto_fitnesses.npy")
 
 
-def _save_run_info(pareto, wall_time, n_events, n_ee, n_epion):
+def _save_run_info(pareto, wall_time, n_events, n_ee, n_pi):
     info = {
-        'n_events':       n_events,
-        'n_ee':           n_ee,
-        'n_epion':        n_epion,
-        'num_particles':  NUM_PARTICLES,
-        'num_iterations': NUM_ITERATIONS,
-        'pareto_size':    len(pareto),
-        'wall_time_h':    round(wall_time / 3600, 3),
-        'param_names':    PARAM_NAMES,
-        'lower_bounds':   LOWER_BOUNDS,
-        'upper_bounds':   UPPER_BOUNDS,
-        'default_params': DEFAULT_PARAMS,
-        'random_seed':    RANDOM_SEED,
+        'n_events':        n_events,
+        'n_ee':            n_ee,
+        'n_pi':         n_pi,
+        'num_particles':   NUM_PARTICLES,
+        'num_iterations':  NUM_ITERATIONS,
+        'pareto_size':     len(pareto),
+        'wall_time_h':     round(wall_time / 3600, 3),
+        'param_names':     PARAM_NAMES,
+        'obj_names':       OBJ_NAMES,
+        'lower_bounds':    LOWER_BOUNDS,
+        'upper_bounds':    UPPER_BOUNDS,
+        'default_params':  DEFAULT_PARAMS,
+        'random_seed':     RANDOM_SEED,
+        'clue3d_baselines': CLUE3D_BASELINES,
     }
     with open(_path('run_info.json'), 'w') as f:
         json.dump(info, f, indent=2)

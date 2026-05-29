@@ -37,7 +37,7 @@ try:
 except ImportError:
     clue = None
 
-from config import SUBDETS
+from config import SUBDETS, CLUE3D_BASELINES
 
 
 # ── Module-level event store (inherited by workers via fork, zero-copy) ────────
@@ -120,11 +120,12 @@ def _eval_event(args):
         else assign_tracksters_to_cps(tracksters, event['sim_showers'])
     )
     return {
-        'infeasible':   infeasible,
-        'n_tracksters': n,
-        'tracksters':   tracksters,
-        'assignments':  assignments,
-        'sim_showers':  event['sim_showers'],
+        'infeasible':    infeasible,
+        'n_tracksters':  n,
+        'tracksters':    tracksters,
+        'assignments':   assignments,
+        'sim_showers':   event['sim_showers'],
+        'particle_type': event['particle_type'],
     }
 
 
@@ -227,28 +228,34 @@ def _objective_fragmentation(events_results):
 
 def make_objective(events, n_jobs=1):
     """
-    Build the multi-objective callable for joint CEE+CHE optimisation.
+    Build the 6-objective callable for joint CEE+CHE optimisation.
+
+    Objectives are computed separately for ee and ππ events, then each is
+    divided by the corresponding pre-computed CLUE3D baseline so that values
+    < 1 mean "better than CLUE3D".  CLUE3D maps to the point (1,1,1,1,1,1).
 
     Parameters
     ----------
     events : list of per-event dicts from data.load_events()
     n_jobs : int
-        Number of worker processes.  1 = single-process (default).
-        >1 = parallel event evaluation via multiprocessing fork.
-        Set _EVENTS and create the pool BEFORE any CLUEstering calls so
-        workers inherit the event data without pickling.
+        Number of worker processes.
 
     Returns
     -------
     objective_fn : callable
         params[0:5]  CEE parameters
         params[5:10] CHE parameters
-        returns [F1, F2, F3]
+        returns [R1_ee, R2_ee, R3_ee, R1_pi, R2_pi, R3_pi]
+        where R_i_t = F_i_t / CLUE3D_F_i_t  (ratio to CLUE3D)
     """
     global _EVENTS
-    _EVENTS = events   # set before fork so workers inherit it
+    _EVENTS = events
 
     pool = mp.Pool(processes=n_jobs) if n_jobs > 1 else None
+
+    # Pre-load baselines once — never recomputed during optimisation
+    b_ee    = CLUE3D_BASELINES['ee']
+    b_pi = CLUE3D_BASELINES['pi']
 
     def objective_fn(params):
         cee_params = list(params[:5])
@@ -256,19 +263,34 @@ def make_objective(events, n_jobs=1):
         args = [(i, cee_params, che_params) for i in range(len(events))]
 
         if pool is not None:
-            events_results = pool.map(_eval_event, args)
+            all_results = pool.map(_eval_event, args)
         else:
-            events_results = [_eval_event(a) for a in args]
+            all_results = [_eval_event(a) for a in args]
 
-        if not events_results or any(r['infeasible'] for r in events_results):
-            return [np.inf, np.inf, np.inf]
+        # Split by particle type
+        res_ee    = [r for r in all_results if r['particle_type'] == 'ee']
+        res_pi = [r for r in all_results if r['particle_type'] == 'pi']
+
+        # Any infeasible event in either subset → whole evaluation infeasible
+        if (not res_ee or not res_pi
+                or any(r['infeasible'] for r in all_results)):
+            return [np.inf] * 6
+
+        f1_ee    = _objective_purity(res_ee)
+        f2_ee    = _objective_efficiency(res_ee)
+        f3_ee    = _objective_fragmentation(res_ee)
+        f1_pi = _objective_purity(res_pi)
+        f2_pi = _objective_efficiency(res_pi)
+        f3_pi = _objective_fragmentation(res_pi)
 
         return [
-            _objective_purity(events_results),
-            _objective_efficiency(events_results),
-            _objective_fragmentation(events_results),
+            f1_ee    / b_ee['f1'],
+            f2_ee    / b_ee['f2'],
+            f3_ee    / b_ee['f3'],
+            f1_pi / b_pi['f1'],
+            f2_pi / b_pi['f2'],
+            f3_pi / b_pi['f3'],
         ]
 
-    # Attach pool so caller can close it cleanly after optimisation
     objective_fn._pool = pool
     return objective_fn
