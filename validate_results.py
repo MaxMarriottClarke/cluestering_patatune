@@ -825,8 +825,12 @@ def fig_pairplot(df):
         )
 
         # Bin the objective into 4 quantile groups for pairplot colouring
+        all_labels = ["Q1 (best)", "Q2", "Q3", "Q4 (worst)"]
+        _, bins = pd.qcut(plot_df[label], q=4, retbins=True, duplicates="drop")
+        n_bins = len(bins) - 1
         plot_df["_q"] = pd.qcut(plot_df[label], q=4,
-                                 labels=["Q1 (best)", "Q2", "Q3", "Q4 (worst)"])
+                                 labels=all_labels[:n_bins],
+                                 duplicates="drop")
         palette = sns.color_palette("RdYlGn_r", 4)
 
         g = sns.pairplot(

@@ -38,8 +38,8 @@ PARAM_NAMES = [
 ]
 
 #                              CEE                       CHE
-LOWER_BOUNDS  = [1.0,  0.1,  3.0,  1.0,  0.4,    1.0,  0.1,  2.5,  2.5,  0.4]
-UPPER_BOUNDS  = [6.0, 10.0, 20.0, 20.0,  1.0, 10.0, 10.0, 20.0, 20.0,  1.0]
+LOWER_BOUNDS  = [1.0,  0.01,  3.0,  1.0,  0.4,    1.0,  0.01,  1.0,  1.0,  0.2]
+UPPER_BOUNDS  = [6.0, 10.0, 20.0, 20.0,  1.0, 10.0, 10.0, 30.0, 30.0,  1.0]
 DEFAULT_PARAMS = [2.85, 3.31, 4.50, 4.50, 0.859, 2.38, 2.83, 4.60, 5.53, 0.477]
 
 # ── Objective names ───────────────────────────────────────────────────────────
@@ -82,10 +82,10 @@ N_JOBS = 8
 
 # ── MOPSO hyperparameters ──────────────────────────────────────────────────────
 NUM_PARTICLES  = 100
-NUM_ITERATIONS = 100
+NUM_ITERATIONS = 150
 INERTIA        = 0.6
 COGNITIVE      = 1.5
-SOCIAL         = 2.0
+SOCIAL         = 1.5
 MAX_PARETO     = 100
 TOPOLOGY       = 'random'
 RANDOM_SEED    = 42
