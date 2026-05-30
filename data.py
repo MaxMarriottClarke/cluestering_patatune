@@ -59,7 +59,7 @@ def load_events(data_dir=None, files=None, truth_branch=None, branches=None):
     Returns
     -------
     events : list of per-event dicts (alternating ee / pi)
-        [ee_0, pi_0, ee_1, pi_0, ...]
+        [ee_0, pi_0, ee_1, pi_1, ...]
     """
     if data_dir    is None: data_dir     = DATA_DIR
     if files       is None: files        = FILES

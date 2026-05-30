@@ -671,8 +671,7 @@ def fig_correlation_clustermap(df):
 def fig_parallel_coords(df, best, colour_by=1, baseline=None):
     """colour_by: index into OBJ_NAMES used to colour background lines."""
     all_cols  = PARAM_NAMES + OBJ_NAMES
-    all_labels = ([PARAM_LABELS_SHORT[p] for p in PARAM_NAMES]
-                  + ["F1: Impurity", "F2: Eff. deficit", "F3: Fragmentation"])
+    all_labels = ([PARAM_LABELS_SHORT[p] for p in PARAM_NAMES] + OBJ_LABELS)
 
     # Normalise to [0,1] per column using Pareto front range
     col_min = df[all_cols].min()
@@ -705,7 +704,7 @@ def fig_parallel_coords(df, best, colour_by=1, baseline=None):
 
     # CLUE3D baseline — only the objective axes are defined; param axes are N/A
     if baseline is not None:
-        bv_raw  = np.array([baseline["f1"], baseline["f2"], baseline["f3"]])
+        bv_raw  = np.ones(len(OBJ_NAMES))   # CLUE3D is ratio=1.0 for all objectives
         obj_start = len(PARAM_NAMES)
         # Normalise CLUE3D objectives using the same Pareto-front scale
         bv_norm = (bv_raw - col_min[OBJ_NAMES].values) / (
@@ -755,21 +754,33 @@ def fig_parallel_coords(df, best, colour_by=1, baseline=None):
 
 # ── Figure 7: Best solutions — radar chart ───────────────────────────────────
 
-def fig_radar(df, best):
-    """Radar chart of all 10 parameters for the 4 best solutions, normalised."""
+def fig_radar(df, best, info=None):
+    """Radar chart of all 10 parameters for the best solutions, normalised.
+    Bounds are read from run_info (saved by optimize.py) so they always match
+    the actual optimisation bounds rather than being hardcoded."""
     n_params = len(PARAM_NAMES)
     angles   = np.linspace(0, 2 * np.pi, n_params, endpoint=False).tolist()
-    angles  += angles[:1]                   # close the polygon
+    angles  += angles[:1]
 
     labels_radar = [PARAM_LABELS_SHORT[p] for p in PARAM_NAMES]
 
-    fig, axes = plt.subplots(1, 4, figsize=(18, 5),
-                              subplot_kw=dict(polar=True))
+    # Read bounds from run_info so the radar matches whatever bounds were used
+    if info is not None:
+        lower = np.array(info.get("lower_bounds", [0.0] * n_params), dtype=float)
+        upper = np.array(info.get("upper_bounds", [1.0] * n_params), dtype=float)
+    else:
+        lower = np.zeros(n_params)
+        upper = np.ones(n_params)
+
+    n_best = len(best)
+    ncols  = min(n_best, 4)
+    nrows  = (n_best + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols,
+                             figsize=(5 * ncols, 5 * nrows),
+                             subplot_kw=dict(polar=True))
+    axes = np.array(axes).flatten()
     fig.suptitle("Best Solutions — Normalised Parameter Radar",
                  fontsize=14, fontweight="bold")
-
-    lower = np.array([0.5, 0.5, 0.5, 0.5, 0.1, 0.5, 0.5, 0.5, 0.5, 0.1])
-    upper = np.array([5.0, 10.0, 10.0, 10.0, 1.0, 8.0, 15.0, 15.0, 15.0, 1.0])
 
     for ax, (label, idx), color in zip(axes, best.items(), BEST_COLORS):
         row    = df.iloc[idx][PARAM_NAMES].values.astype(float)
@@ -787,10 +798,14 @@ def fig_radar(df, best):
         ax.grid(color="grey", alpha=0.3)
 
         fvals = df.iloc[idx][OBJ_NAMES].values
+        obj_str = "  ".join(f"{n}={v:.3f}" for n, v in zip(OBJ_NAMES, fvals))
         ax.set_title(
-            f"{label.replace(chr(10), ' ')}\n"
-            f"F1={fvals[0]:.4f}  F2={fvals[1]:.4f}  F3={fvals[2]:.2f}",
-            fontsize=9, pad=18, color=color, fontweight="bold")
+            f"{label.replace(chr(10), ' ')}\n{obj_str}",
+            fontsize=7, pad=18, color=color, fontweight="bold")
+
+    # Hide unused axes
+    for ax in axes[n_best:]:
+        ax.set_visible(False)
 
     fig.tight_layout()
     return fig
@@ -838,7 +853,7 @@ def fig_cee_vs_che(df, best):
     nice_labels = [r"$\rho_r$", r"$\rho_\mathrm{min}$",
                    r"$d_\mathrm{out}$", r"$d_\mathrm{seed}$", r"$w_z$"]
 
-    f3     = df["F3_fragmentation"].values
+    f3     = df[["R3_ee", "R3_pi"]].mean(axis=1).values
     f3norm = (f3 - f3.min()) / (f3.max() - f3.min() + 1e-12)
 
     fig, axes = plt.subplots(1, 5, figsize=(20, 4))
@@ -1175,9 +1190,7 @@ def main():
     for label, idx in best.items():
         row = df.iloc[idx]
         print(f"  [{idx:3d}] {label.replace(chr(10),' '):<35s} "
-              f"F1={row['F1_purity']:.4f}  "
-              f"F2={row['F2_efficiency_deficit']:.4f}  "
-              f"F3={row['F3_fragmentation']:.2f}")
+              + "  ".join(f"{n}={row[n]:.4f}" for n in OBJ_NAMES))
 
     print_top10(df)
 
@@ -1189,7 +1202,7 @@ def main():
     fig_param_violin(df, info)                               # saves 04a + 04b internally
     save(fig_correlation_clustermap(df),                     "05_correlation_clustermap.png")
     save(fig_parallel_coords(df, best, colour_by=1),         "06_parallel_coordinates.png")
-    save(fig_radar(df, best),                                "07_radar_best_solutions.png")
+    save(fig_radar(df, best, info),                          "07_radar_best_solutions.png")
     fig_pairplot(df)                                         # saves 08a/b/c internally
     save(fig_cee_vs_che(df, best),                           "09_cee_vs_che.png")
     save(fig_tradeoff(df, best),                             "10_tradeoff_density.png")

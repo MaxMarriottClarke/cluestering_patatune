@@ -1,0 +1,28 @@
+# Directories
+tmp/
+logs/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Jupyter
+.ipynb_checkpoints/
+
+# NumPy / output files
+*.npy
+*.npz
+
+
+# ROOT files
+*.root
+
+# Checkpoints
+checkpoints_*/
+

@@ -294,3 +294,61 @@ def make_objective(events, n_jobs=1):
 
     objective_fn._pool = pool
     return objective_fn
+
+
+def make_staged_objective(events, n_jobs=1, subdet='CEE', fixed_other_params=None):
+    """
+    5-parameter, 3-objective callable for staged single-subdet optimisation.
+
+    subdet='CEE': optimise CEE params on ee events only;
+                  CHE fixed at fixed_other_params (defaults to DEFAULT_PARAMS[5:])
+    subdet='CHE': optimise CHE params on pi events only;
+                  CEE fixed at fixed_other_params (must be supplied — best from Phase 1)
+
+    Returns callable(params[5]) -> [R1, R2, R3] for the relevant particle type,
+    each divided by the corresponding CLUE3D baseline (< 1 = better than CLUE3D).
+
+    The pool is forked *after* _EVENTS is set, so workers always see the correct
+    filtered event list.  Close the returned obj._pool before calling this again.
+    """
+    global _EVENTS
+
+    assert subdet in ('CEE', 'CHE'), f"subdet must be 'CEE' or 'CHE', got {subdet!r}"
+    ptype = 'ee' if subdet == 'CEE' else 'pi'
+
+    filtered = [e for e in events if e['particle_type'] == ptype]
+    if not filtered:
+        raise ValueError(f"No events with particle_type='{ptype}' found in event list")
+
+    _EVENTS = filtered   # must be set before pool fork
+
+    if fixed_other_params is None:
+        from config import DEFAULT_PARAMS
+        fixed_other_params = DEFAULT_PARAMS[5:] if subdet == 'CEE' else DEFAULT_PARAMS[:5]
+    fixed_other_params = list(fixed_other_params)
+
+    pool = mp.Pool(processes=n_jobs) if n_jobs > 1 else None
+    b    = CLUE3D_BASELINES[ptype]
+
+    def objective_fn(params):
+        if subdet == 'CEE':
+            cee_params = list(params[:5])
+            che_params = fixed_other_params
+        else:
+            cee_params = fixed_other_params
+            che_params = list(params[:5])
+
+        args = [(i, cee_params, che_params) for i in range(len(filtered))]
+        all_results = (pool.map(_eval_event, args) if pool is not None
+                       else [_eval_event(a) for a in args])
+
+        if not all_results or any(r['infeasible'] for r in all_results):
+            return [np.inf] * 3
+
+        f1 = _objective_purity(all_results)
+        f2 = _objective_efficiency(all_results)
+        f3 = _objective_fragmentation(all_results)
+        return [f1 / b['f1'], f2 / b['f2'], f3 / b['f3']]
+
+    objective_fn._pool = pool
+    return objective_fn
