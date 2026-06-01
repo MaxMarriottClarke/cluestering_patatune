@@ -22,7 +22,6 @@ build/
 
 *.cc
 # ROOT files
-*.root
 
 # Checkpoints
 checkpoints_*/
