@@ -22,7 +22,7 @@ from objective import (
     _objective_efficiency,
     _objective_fragmentation,
     filter_lcs_by_subdet,
-    make_objective,
+    make_staged_objective,
 )
 
 
@@ -279,9 +279,13 @@ class TestObjectiveEfficiency:
 # ── _objective_fragmentation ───────────────────────────────────────────────────
 
 class TestObjectiveFragmentation:
+    """
+    F3 = mean over events of max(0, N_total_tracksters - 2).
+    Only the total count matters; subdet labels on tracksters are irrelevant.
+    """
 
-    def test_perfect_ee_event(self):
-        """Two CEE tracksters, one per CP → F3 = 0."""
+    def test_two_tracksters_scores_zero(self):
+        """Exactly 2 tracksters (one per particle) → F3 = 0."""
         result = _feasible_result(
             tracksters  = [_trackster([0], [1.0], 'CEE'),
                            _trackster([1], [1.0], 'CEE')],
@@ -290,60 +294,59 @@ class TestObjectiveFragmentation:
         )
         assert _objective_fragmentation([result]) == pytest.approx(0.0)
 
-    def test_perfect_pion_event(self):
+    def test_three_tracksters_scores_one(self):
         """
-        3 tracksters: electron (CEE), pion-CEE, pion-CHE.
-        Each CP has 1 trackster per subdetector → F3 = 0.
-        This is the key case that was wrong before the fix.
+        3 tracksters (e.g. electron + pion-CEE + pion-CHE) → F3 = 1.
+        Previously the (CP, subdet) formula scored this as 0; the corrected
+        formula counts total excess above 2 regardless of subdet.
         """
         result = _feasible_result(
             tracksters  = [
-                _trackster([0], [1.0], 'CEE'),      # electron
-                _trackster([1], [1.0], 'CEE'),      # pion CEE
-                _trackster([2], [1.0], 'CHE'),  # pion CHE
+                _trackster([0], [1.0], 'CEE'),
+                _trackster([1], [1.0], 'CEE'),
+                _trackster([2], [1.0], 'CHE'),
             ],
-            assignments = {
-                0: (0, 0.0),   # electron → CP 0
-                1: (1, 0.0),   # pion CEE → CP 1
-                2: (1, 0.0),   # pion CHE → CP 1
-            },
+            assignments = {0: (0, 0.0), 1: (1, 0.0), 2: (1, 0.0)},
             sim_showers = [],
         )
-        # (CP0, CEE):1  (CP1, CEE):1  (CP1, CHE):1 → no excess
-        assert _objective_fragmentation([result]) == pytest.approx(0.0)
-
-    def test_cee_oversplit(self):
-        """Pion's CEE portion split into 2 CEE tracksters → F3 = 1."""
-        result = _feasible_result(
-            tracksters  = [
-                _trackster([0],    [1.0], 'CEE'),      # electron
-                _trackster([1],    [1.0], 'CEE'),      # pion CEE fragment 1
-                _trackster([2],    [1.0], 'CEE'),      # pion CEE fragment 2  ← bad
-                _trackster([3],    [1.0], 'CHE'),  # pion CHE
-            ],
-            assignments = {
-                0: (0, 0.0),
-                1: (1, 0.0),
-                2: (1, 0.0),   # second CEE trackster also assigned to pion
-                3: (1, 0.0),
-            },
-            sim_showers = [],
-        )
-        # (CP0,CEE):1  (CP1,CEE):2 → excess=1  (CP1,CHE):1 → total excess=1
         assert _objective_fragmentation([result]) == pytest.approx(1.0)
 
-    def test_averaged_over_events(self):
-        """F3 is the mean of per-event fragmentation."""
-        # Event 1: no fragmentation
-        r1 = _feasible_result(
-            [_trackster([0],[1.],'CEE'), _trackster([1],[1.],'CEE')],
-            {0:(0,0.), 1:(1,0.)}, [],
+    def test_four_tracksters_scores_two(self):
+        """
+        4 tracksters (e.g. both pions each split into CEE+CHE) → F3 = 2.
+        This is the natural minimum for a two-pion event with CLUEstering's
+        per-subdet split; it correctly shows as non-zero (better than CLUE3D's
+        ~9.4, but honestly above the 2-particle ideal).
+        """
+        result = _feasible_result(
+            tracksters  = [
+                _trackster([0], [1.0], 'CEE'),
+                _trackster([1], [1.0], 'CEE'),
+                _trackster([2], [1.0], 'CHE'),
+                _trackster([3], [1.0], 'CHE'),
+            ],
+            assignments = {0: (0, 0.0), 1: (1, 0.0), 2: (0, 0.0), 3: (1, 0.0)},
+            sim_showers = [],
         )
-        # Event 2: 1 fragmentation
-        r2 = _feasible_result(
-            [_trackster([0],[1.],'CEE'), _trackster([1],[1.],'CEE'),
-             _trackster([2],[1.],'CEE')],
-            {0:(0,0.), 1:(1,0.), 2:(1,0.)}, [],
+        assert _objective_fragmentation([result]) == pytest.approx(2.0)
+
+    def test_subdet_field_ignored(self):
+        """The subdet label on tracksters does not affect F3 — only N_total matters."""
+        for subdets in [('CEE', 'CEE', 'CEE'), ('CHE', 'CHE', 'CHE'), ('CEE', 'CHE', 'CEE')]:
+            ts = [_trackster([i], [1.0], s) for i, s in enumerate(subdets)]
+            result = _feasible_result(ts, {i: (0, 0.0) for i in range(3)}, [])
+            assert _objective_fragmentation([result]) == pytest.approx(1.0)
+
+    def test_averaged_over_events(self):
+        """F3 is the mean of per-event excess counts."""
+        r1 = _feasible_result(                                    # N=2 → 0
+            [_trackster([0], [1.], 'CEE'), _trackster([1], [1.], 'CEE')],
+            {0: (0, 0.), 1: (1, 0.)}, [],
+        )
+        r2 = _feasible_result(                                    # N=3 → 1
+            [_trackster([0], [1.], 'CEE'), _trackster([1], [1.], 'CEE'),
+             _trackster([2], [1.], 'CEE')],
+            {0: (0, 0.), 1: (1, 0.), 2: (1, 0.)}, [],
         )
         assert _objective_fragmentation([r1, r2]) == pytest.approx(0.5)
 
@@ -388,16 +391,17 @@ class TestFilterLcsBySubdet:
         assert len(lcs['indexes']) == 0
 
 
-# ── make_objective (integration) ───────────────────────────────────────────────
+# ── make_staged_objective (integration) ────────────────────────────────────────
 
-class TestMakeObjective:
+class TestMakeStagedObjective:
     """
-    Integration tests that mock run_cluestering so CLUEstering doesn't need
-    to be installed.  The mock returns pre-defined tracksters per subdetector.
+    Integration tests using make_staged_objective (the actual code path used
+    during optimisation).  run_cluestering is mocked so CLUEstering need not
+    be installed.  All tests use subdet='CEE' with ee events.
     """
 
     def _make_event(self, particle_type='ee'):
-        """Minimal valid event: 2 CPs, LCs in CEE only (electron-like)."""
+        """Minimal valid event: 2 CPs, all LCs in CEE (electron-like)."""
         return {
             'particle_type': particle_type,
             'sim_showers': [
@@ -425,71 +429,73 @@ class TestMakeObjective:
         }
 
     def _perfect_cluestering(self, lcs, *args):
-        """Mock: returns 2 perfectly clean tracksters from CEE, nothing from CHE."""
+        """Mock: 2 clean tracksters splitting LCs evenly; empty for CHE."""
         if len(lcs['indexes']) == 0:
             return []
-        # Split LCs [0,1] → trackster 0,  [2,3] → trackster 1
         mid = len(lcs['indexes']) // 2
         return [
-            {'lc_indexes': lcs['indexes'][:mid],  'lc_energies': lcs['energy'][:mid]},
-            {'lc_indexes': lcs['indexes'][mid:],  'lc_energies': lcs['energy'][mid:]},
+            {'lc_indexes': lcs['indexes'][:mid], 'lc_energies': lcs['energy'][:mid]},
+            {'lc_indexes': lcs['indexes'][mid:], 'lc_energies': lcs['energy'][mid:]},
         ]
 
     def _single_trackster(self, lcs, *args):
-        """Mock: returns only 1 trackster → infeasible."""
+        """Mock: 1 trackster → total < 2 → infeasible."""
         if len(lcs['indexes']) == 0:
             return []
         return [{'lc_indexes': lcs['indexes'], 'lc_energies': lcs['energy']}]
 
     def test_perfect_reconstruction_scores_zero(self):
+        """Perfect clustering: 2 clean tracksters for 2 CPs → all objectives 0."""
         events = [self._make_event()]
         with patch('objective.run_cluestering', side_effect=self._perfect_cluestering):
-            obj_fn = make_objective(events)
-            f1, f2, f3 = obj_fn([1.0]*10)
+            obj_fn = make_staged_objective(events, subdet='CEE')
+            f1, f2, f3 = obj_fn([1.0] * 5)
         assert f1 == pytest.approx(0.0, abs=1e-6)
         assert f2 == pytest.approx(0.0, abs=1e-6)
         assert f3 == pytest.approx(0.0, abs=1e-6)
 
     def test_infeasible_returns_inf(self):
+        """1 total trackster → infeasible → [inf, inf, inf]."""
         events = [self._make_event()]
         with patch('objective.run_cluestering', side_effect=self._single_trackster):
-            obj_fn = make_objective(events)
-            result = obj_fn([1.0]*10)
+            obj_fn = make_staged_objective(events, subdet='CEE')
+            result = obj_fn([1.0] * 5)
         assert all(v == np.inf for v in result)
 
     def test_returns_three_values(self):
+        """make_staged_objective returns exactly 3 objectives."""
         events = [self._make_event()]
         with patch('objective.run_cluestering', side_effect=self._perfect_cluestering):
-            obj_fn = make_objective(events)
-            result = obj_fn([1.0]*10)
+            obj_fn = make_staged_objective(events, subdet='CEE')
+            result = obj_fn([1.0] * 5)
         assert len(result) == 3
 
-    def test_params_split_correctly(self):
+    def test_params_passed_to_cluestering(self):
         """
-        Verify CEE uses params[:5] and CHE uses params[5:10]
-        by checking that the mock receives the correct param set for each subdetector.
+        make_staged_objective(subdet='CEE') passes its 5-param vector directly
+        to run_cluestering for CEE LCs.  CHE LCs are empty in this all-CEE event
+        so run_cluestering is called exactly once.
         """
         received = []
 
         def recording_mock(lcs, *args):
-            received.append((list(lcs['subdet'][:1]), args))  # store subdet + params
+            received.append(args)
             if len(lcs['indexes']) == 0:
                 return []
             mid = len(lcs['indexes']) // 2
             return [
-                {'lc_indexes': lcs['indexes'][:mid],  'lc_energies': lcs['energy'][:mid]},
-                {'lc_indexes': lcs['indexes'][mid:],  'lc_energies': lcs['energy'][mid:]},
+                {'lc_indexes': lcs['indexes'][:mid], 'lc_energies': lcs['energy'][:mid]},
+                {'lc_indexes': lcs['indexes'][mid:], 'lc_energies': lcs['energy'][mid:]},
             ]
 
-        cee_params = [1.0, 2.0, 3.0, 4.0, 0.5]
-        che_params = [5.0, 6.0, 7.0, 8.0, 2.0]
-        params     = cee_params + che_params
+        cee_params  = [1.0, 2.0, 3.0, 4.0, 0.5]
+        che_defaults = [2.38, 2.83, 4.60, 5.53, 0.477]
 
-        events = [self._make_event()]   # all-CEE event
+        events = [self._make_event()]
         with patch('objective.run_cluestering', side_effect=recording_mock):
-            obj_fn = make_objective(events)
-            obj_fn(params)
+            obj_fn = make_staged_objective(events, subdet='CEE',
+                                           fixed_other_params=che_defaults)
+            obj_fn(cee_params)
 
-        # Only CEE LCs in this event → only one CLUEstering call → should use params[:5]
-        assert len(received) == 1
-        assert list(received[0][1]) == pytest.approx(cee_params)
+        assert len(received) == 1                              # one CEE call
+        assert list(received[0]) == pytest.approx(cee_params) # correct params

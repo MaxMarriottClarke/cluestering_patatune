@@ -17,7 +17,6 @@ from data import validate_events
 from config import CEE_Z_BOUNDARY
 
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
 
 def _assign_subdet(all_z):
     """Replicate the 2-way subdet logic from data._build_event."""

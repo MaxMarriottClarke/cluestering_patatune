@@ -10,7 +10,7 @@ Three objectives — all minimised:
 
   F1  purity        mean over events of [max RecoToSim score across all tracksters]
   F2  efficiency    mean over events of [1 - min(CP efficiency across CEE+CHE)]
-  F3  fragmentation mean over events of [extra tracksters per (CP, subdetector) pair]
+  F3  fragmentation mean over events of [max(0, N_total_tracksters - 2)]
 
 Infeasibility: total tracksters (CEE + CHE) < 2 in any event → (inf, inf, inf).
 
@@ -32,24 +32,19 @@ import multiprocessing as mp
 import numpy as np
 import pandas as pd
 
-try:
-    import CLUEstering as clue
-except ImportError:
-    clue = None
-
 from config import SUBDETS, CLUE3D_BASELINES
 
 
-# ── Module-level event store (inherited by workers via fork, zero-copy) ────────
 
 _EVENTS = None   # set by make_objective before pool creation
 
 
-# ── CLUEstering wrapper ────────────────────────────────────────────────────────
 
 def run_cluestering(lcs, density_radius, min_density,
                     outlier_distance, seeding_distance, w_z):
-    if clue is None:
+    try:
+        import CLUEstering as clue
+    except ImportError:
         raise ImportError("CLUEstering is not installed in this environment")
 
     data = pd.DataFrame({
@@ -91,7 +86,6 @@ def filter_lcs_by_subdet(all_lcs, subdet):
     }
 
 
-# ── Per-event evaluation — module-level so it is picklable ────────────────────
 
 def _eval_event(args):
     """
@@ -129,7 +123,6 @@ def _eval_event(args):
     }
 
 
-# ── Scoring primitives ─────────────────────────────────────────────────────────
 
 def reco_to_sim_score(trackster_lc_indexes, trackster_lc_energies, cp_lc_index_set):
     total = float(np.asarray(trackster_lc_energies).sum())
@@ -168,7 +161,6 @@ def _shared_energy(trackster, cp):
     ))
 
 
-# ── Objective sub-functions ────────────────────────────────────────────────────
 
 def _objective_purity(events_results):
     per_event = []
@@ -205,22 +197,12 @@ def _objective_efficiency(events_results):
 
 
 def _objective_fragmentation(events_results):
-    """
-    F3: extra tracksters per (CP, subdetector) pair.
-    A pion with 1 CEE + 1 CHE trackster scores 0 (expected).
-    A pion with 2 CEE tracksters scores 1 (over-split).
-    """
+    """F3: total tracksters beyond the 2 input particles per event."""
     per_event = []
     for result in events_results:
         if result['infeasible']:
             return np.inf
-        cp_subdet_counts = {}
-        for t_id, (best_cp_id, _) in result['assignments'].items():
-            subdet = result['tracksters'][t_id].get('subdet', 'unknown')
-            key    = (best_cp_id, subdet)
-            cp_subdet_counts[key] = cp_subdet_counts.get(key, 0) + 1
-        excess = sum(max(0, count - 1) for count in cp_subdet_counts.values())
-        per_event.append(float(excess))
+        per_event.append(float(max(0, result['n_tracksters'] - 2)))
     return float(np.mean(per_event))
 
 

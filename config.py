@@ -1,4 +1,3 @@
-# ── Data ───────────────────────────────────────────────────────────────────────
 DATA_DIR = 'Data'
 
 FILES = {
@@ -17,7 +16,6 @@ BRANCHES = [
     'vertices_multiplicity',
 ]
 
-# ── Subdetector boundaries ─────────────────────────────────────────────────────
 # CLUEstering is run separately on CEE and CHE (different detector geometry),
 # but quality is scored globally across both.
 #
@@ -29,7 +27,6 @@ CEE_Z_BOUNDARY = 364.55   # cm — midpoint between layer 26 and 27
 
 SUBDETS = ['CEE', 'CHE']
 
-# ── Parameters — one joint 10-element vector [CEE×5, CHE×5] ──────────────────
 PARAM_NAMES = [
     'density_radius_cee',  'min_density_cee',  'outlier_distance_cee',
     'seeding_distance_cee', 'w_z_cee',
@@ -42,7 +39,6 @@ LOWER_BOUNDS  = [1.0,  0.01,  3.0,  1.0,  0.4,    1.0,  0.01,  1.0,  1.0,  0.2]
 UPPER_BOUNDS  = [6.0, 10.0, 20.0, 20.0,  1.0, 10.0, 10.0, 30.0, 30.0,  1.0]
 DEFAULT_PARAMS = [2.85, 3.31, 4.50, 4.50, 0.859, 2.38, 2.83, 4.60, 5.53, 0.477]
 
-# ── Objective names ───────────────────────────────────────────────────────────
 # 6 ratio objectives: each raw metric divided by the corresponding CLUE3D value.
 # Values < 1 = better than CLUE3D.  CLUE3D maps to the point (1,1,1,1,1,1).
 OBJ_NAMES = [
@@ -50,8 +46,7 @@ OBJ_NAMES = [
     'R1_pi', 'R2_pi', 'R3_pi',
 ]
 
-# ── CLUE3D per-type baselines ──────────────────────────────────────────────────
-# Pre-computed once via validate_results.py → results/clue3d_baseline.json.
+# CLUE3D Baselin
 # These are the CLUE3D values on the same 1000-event dataset used for tuning.
 # Used as the normalisation denominator so each objective has target < 1.
 CLUE3D_BASELINES = {
@@ -67,20 +62,14 @@ CLUE3D_BASELINES = {
     },
 }
 
-# ── Event subsampling ─────────────────────────────────────────────────────────
-# Number of events used during optimisation (per particle type, so total = 2×).
-# Kept balanced: N_EVENTS//2 ee + N_EVENTS//2 pi, interleaved.
-# After optimisation, re-evaluate the Pareto front on the full dataset.
-# Set to None to use all available events.
 N_EVENTS = 1000
 
-# ── Parallelism ───────────────────────────────────────────────────────────────
 # Number of worker processes for parallel event evaluation within each
 # objective call.  Set to match request_cpus in condor.sub.
 # Rule of thumb: 8 workers × 1000 events → ~6.5h on workday flavour.
 N_JOBS = 8
 
-# ── MOPSO hyperparameters ──────────────────────────────────────────────────────
+# MOPSO Hyperparameters
 NUM_PARTICLES  = 100
 NUM_ITERATIONS = 150
 INERTIA        = 0.6
@@ -90,5 +79,4 @@ MAX_PARETO     = 100
 TOPOLOGY       = 'random'
 RANDOM_SEED    = 42
 
-# ── Output ────────────────────────────────────────────────────────────────────
 OUTPUT_DIR = 'results'

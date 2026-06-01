@@ -1,0 +1,93 @@
+{
+  "mode": "staged",
+  "n_events": 1000,
+  "n_ee": 500,
+  "n_pi": 500,
+  "num_particles": 100,
+  "num_iterations": 150,
+  "pareto_size": 100,
+  "wall_time_h": 15.124,
+  "cee_wall_time_h": 9.493,
+  "che_wall_time_h": 5.631,
+  "param_names": [
+    "density_radius_cee",
+    "min_density_cee",
+    "outlier_distance_cee",
+    "seeding_distance_cee",
+    "w_z_cee",
+    "density_radius_che",
+    "min_density_che",
+    "outlier_distance_che",
+    "seeding_distance_che",
+    "w_z_che"
+  ],
+  "obj_names": [
+    "R1_ee",
+    "R2_ee",
+    "R3_ee",
+    "R1_pi",
+    "R2_pi",
+    "R3_pi"
+  ],
+  "lower_bounds": [
+    1.0,
+    0.01,
+    3.0,
+    1.0,
+    0.4,
+    1.0,
+    0.01,
+    1.0,
+    1.0,
+    0.2
+  ],
+  "upper_bounds": [
+    6.0,
+    10.0,
+    20.0,
+    20.0,
+    1.0,
+    10.0,
+    10.0,
+    30.0,
+    30.0,
+    1.0
+  ],
+  "default_params": [
+    2.85,
+    3.31,
+    4.5,
+    4.5,
+    0.859,
+    2.38,
+    2.83,
+    4.6,
+    5.53,
+    0.477
+  ],
+  "random_seed": 42,
+  "clue3d_baselines": {
+    "ee": {
+      "f1": 0.08188021960670597,
+      "f2": 0.07743506729522537,
+      "f3": 0.64
+    },
+    "pi": {
+      "f1": 0.3004829949293515,
+      "f2": 0.42645414425151495,
+      "f3": 9.386
+    }
+  },
+  "fixed_cee_params": [
+    1.9900534205238491,
+    1.3582662041347708,
+    8.343738085179703,
+    3.916318576232519,
+    0.9548358146158352
+  ],
+  "fixed_cee_fitness": [
+    0.325750125433456,
+    0.9356302292799076,
+    0.6499999999999999
+  ]
+}

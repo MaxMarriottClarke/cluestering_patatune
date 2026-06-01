@@ -18,7 +18,10 @@ cd $WORKDIR
 # PYTHONUNBUFFERED=1 forces every print() to flush immediately.
 # Direct redirect (no pipe) so there is no pipe buffer to fill before writing.
 export PYTHONUNBUFFERED=1
-$PYTHON optimize_staged.py > logs/live.out 2>&1
+$PYTHON optimize_staged.py \
+    --phase che \
+    --output-dir results_che_newf3 \
+    > logs/live_che_newf3.out 2>&1
 
 echo ""
 echo "=== Job finished at $(date) ==="

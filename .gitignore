@@ -20,6 +20,7 @@ build/
 *.npz
 
 
+*.cc
 # ROOT files
 *.root
 
