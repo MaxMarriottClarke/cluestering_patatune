@@ -30,7 +30,7 @@ plt.rcParams.update({
 })
 
 RESULTS_DIR = Path("results")
-OUTPUT_DIR  = Path("/eos/user/m/mmarriot/php-plots/cluestering")
+OUTPUT_DIR  = Path("/eos/user/m/mmarriot/php-plots/cluestering/parameters")
 
 PARAM_NAMES = [
     "density_radius_cee", "min_density_cee", "outlier_distance_cee",

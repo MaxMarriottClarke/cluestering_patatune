@@ -23,6 +23,7 @@ build/
 *.cc
 # ROOT files
 
+CLAUDE.md
 # Checkpoints
 checkpoints_*/
 
