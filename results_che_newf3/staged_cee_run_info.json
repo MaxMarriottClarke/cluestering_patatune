@@ -1,0 +1,60 @@
+{
+  "phase": "CEE",
+  "particle_type": "ee",
+  "n_events": 500,
+  "pareto_size": 100,
+  "wall_time_h": 9.493,
+  "param_names": [
+    "density_radius_cee",
+    "min_density_cee",
+    "outlier_distance_cee",
+    "seeding_distance_cee",
+    "w_z_cee"
+  ],
+  "obj_names": [
+    "R1_ee",
+    "R2_ee",
+    "R3_ee"
+  ],
+  "lower_bounds": [
+    1.0,
+    0.01,
+    3.0,
+    1.0,
+    0.4
+  ],
+  "upper_bounds": [
+    6.0,
+    10.0,
+    20.0,
+    20.0,
+    1.0
+  ],
+  "default_params": [
+    2.85,
+    3.31,
+    4.5,
+    4.5,
+    0.859
+  ],
+  "best_balanced_idx": 56,
+  "best_balanced_params": [
+    1.9900534205238491,
+    1.3582662041347708,
+    8.343738085179703,
+    3.916318576232519,
+    0.9548358146158352
+  ],
+  "best_balanced_fitness": [
+    0.325750125433456,
+    0.9356302292799076,
+    0.6499999999999999
+  ],
+  "clue3d_baselines": {
+    "ee": {
+      "f1": 0.08188021960670597,
+      "f2": 0.07743506729522537,
+      "f3": 0.64
+    }
+  }
+}

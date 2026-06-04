@@ -1,5 +1,5 @@
 executable = run_physics.sh
-arguments  = --results-dir results --rows 1 22 65 --output-dir /eos/user/m/mmarriot/php-plots/cluestering/physics
+arguments  = --results-dir results --rows 1 65 --output-dir /eos/user/m/mmarriot/php-plots/cluestering/physics2
 
 output = logs/physics_job.out
 error  = logs/physics_job.err

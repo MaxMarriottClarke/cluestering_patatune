@@ -37,8 +37,8 @@ import numpy as np
 import pandas as pd
 
 import objective as obj_module
-from objective import _eval_event, _shared_energy
-from config import PARAM_NAMES
+from objective import _eval_event, _shared_energy, assign_tracksters_to_cps
+from config import PARAM_NAMES, FILES
 from data import load_events
 
 
@@ -55,6 +55,11 @@ plt.rcParams.update({
 
 OBJ_NAMES = ["R1_ee", "R2_ee", "R3_ee", "R1_pi", "R2_pi", "R3_pi"]
 N_BINS    = 5
+
+# Only count tracksters built from more than 2 layer clusters. Drops the tiny
+# leakage blobs (mostly 1-2 LC CHE tracksters in ee events) that otherwise
+# pollute purity / number ratio. Applied to both CLUEstering and CLUE3D.
+MIN_TRACKSTER_LCS = 3
 
 
 # ── Ranking ───────────────────────────────────────────────────────────────────
@@ -89,17 +94,62 @@ def print_table(ranked):
 
 # ── CLUEstering evaluation ────────────────────────────────────────────────────
 
-def _run_events(events, cee_params, che_params):
-    """Run CLUEstering on all events with given params, return list of result dicts."""
+def _run_events(events, cee_params, che_params, tag=''):
+    """Run CLUEstering on a homogeneous list of events, return result dicts."""
     obj_module._EVENTS = events
     results = []
+    n  = len(events)
     t0 = time.perf_counter()
-    for i in range(len(events)):
+    for i in range(n):
         results.append(_eval_event((i, list(cee_params), list(che_params))))
-        if (i + 1) % 10 == 0 or (i + 1) == len(events):
+        if (i + 1) % 10 == 0 or (i + 1) == n:
             elapsed = time.perf_counter() - t0
-            print(f"  {i+1}/{len(events)} events  {elapsed:.1f}s elapsed  "
+            pfx = f"[{tag}] " if tag else ""
+            print(f"  {pfx}{i+1}/{n} events  {elapsed:.1f}s  "
                   f"({elapsed/(i+1)*1000:.1f}ms/event)", flush=True)
+    return results
+
+
+# ── CLUE3D baseline loading ───────────────────────────────────────────────────
+
+def load_clue3d_results(data_dir, ptype, events):
+    """
+    Load pre-computed CLUE3D tracksters from ROOT and compute assignments using
+    exactly the same reco_to_sim_score / assign_tracksters_to_cps pipeline as
+    CLUEstering, so the metrics are directly comparable.
+    """
+    import uproot
+    import awkward as ak
+
+    path = f"{data_dir}/{FILES[ptype]}"
+    f    = uproot.open(path)
+    tree = f['ticlDumper/hltTiclTrackstersCLUE3DHigh']
+
+    vtx_idx = tree['vertices_indexes'].array()
+    vtx_eng = tree['vertices_energy'].array()
+    n_track = tree['NTracksters'].array()
+
+    results = []
+    for ev_idx, event in enumerate(events):
+        n = int(n_track[ev_idx])
+        tracksters = [
+            {
+                'lc_indexes':  ak.to_numpy(vtx_idx[ev_idx][t]).astype(np.int64),
+                'lc_energies': ak.to_numpy(vtx_eng[ev_idx][t]).astype(np.float32),
+            }
+            for t in range(n)
+        ]
+        infeasible  = n < 2
+        assignments = ({} if infeasible
+                       else assign_tracksters_to_cps(tracksters, event['sim_showers']))
+        results.append({
+            'infeasible':    infeasible,
+            'n_tracksters':  n,
+            'tracksters':    tracksters,
+            'assignments':   assignments,
+            'sim_showers':   event['sim_showers'],
+            'particle_type': ptype,
+        })
     return results
 
 
@@ -111,8 +161,8 @@ def collect_raw_data(events, results):
 
     Returns
     -------
-    tracksters_df : [ptype, cp_energy, score]   — one row per trackster
-    cps_df        : [ptype, cp_energy, is_efficient] — one row per sim CP
+    tracksters_df : [ptype, cp_energy, score]        — one row per trackster
+    cps_df        : [ptype, cp_energy, is_efficient]  — one row per sim CP
     events_df     : [ptype, total_ev_energy, n_reco, n_sim] — one row per event
     """
     t_rows, c_rows, e_rows = [], [], []
@@ -130,23 +180,54 @@ def collect_raw_data(events, results):
         total_ev_energy = float(event['all_lcs']['energy'].sum())
         cp_by_id = {cp['shower_id']: cp for cp in sim_showers}
 
-        # Per-CP efficiency: True if any assigned trackster has shared/cp > 0.5
-        cp_efficient = {cp['shower_id']: False for cp in sim_showers}
-        for t_id, trackster in enumerate(tracksters):
+        # Keep only tracksters with > 2 layer clusters; everything below uses
+        # this filtered set so metrics ignore the leakage blobs.
+        kept = [t_id for t_id, t in enumerate(tracksters)
+                if len(t['lc_indexes']) >= MIN_TRACKSTER_LCS]
+
+        # CP efficiency: sum shared energies of all tracksters assigned by reco-to-sim score
+        cp_shared_sum = {cp['shower_id']: 0.0 for cp in sim_showers}
+        for t_id in kept:
+            trackster  = tracksters[t_id]
             best_cp_id = assignments[t_id][0]
             cp = cp_by_id[best_cp_id]
-            if cp['true_energy'] > 0:
-                if _shared_energy(trackster, cp) / cp['true_energy'] > 0.5:
-                    cp_efficient[best_cp_id] = True
+            cp_shared_sum[best_cp_id] += _shared_energy(trackster, cp)
+
+        # Trackster efficiency: for each CP, find the trackster with the greatest
+        # shared LC energy, then require that trackster's reco-to-sim assignment
+        # also points back to this CP (two-way match) and shared/cp_energy > 0.5.
+        cp_max_shared  = {cp['shower_id']: 0.0  for cp in sim_showers}
+        cp_best_t_id   = {cp['shower_id']: None for cp in sim_showers}
+        for t_id in kept:
+            trackster = tracksters[t_id]
+            for cp in sim_showers:
+                shared = _shared_energy(trackster, cp)
+                if shared > cp_max_shared[cp['shower_id']]:
+                    cp_max_shared[cp['shower_id']] = shared
+                    cp_best_t_id[cp['shower_id']] = t_id
+        cp_efficient = {}
+        for cp in sim_showers:
+            best_t = cp_best_t_id[cp['shower_id']]
+            if best_t is None or cp['true_energy'] <= 0:
+                cp_efficient[cp['shower_id']] = False
+            else:
+                cp_efficient[cp['shower_id']] = (
+                    cp_max_shared[cp['shower_id']] / cp['true_energy'] > 0.5
+                    and assignments[best_t][0] == cp['shower_id']
+                )
 
         for cp in sim_showers:
+            cp_eff = (cp_shared_sum[cp['shower_id']] / cp['true_energy']
+                      if cp['true_energy'] > 0 else np.nan)
             c_rows.append({
-                'ptype':        ptype,
-                'cp_energy':    cp['true_energy'],
-                'is_efficient': int(cp_efficient[cp['shower_id']]),
+                'ptype':         ptype,
+                'cp_energy':     cp['true_energy'],
+                'is_efficient':  int(cp_efficient[cp['shower_id']]),
+                'cp_efficiency': cp_eff,
             })
 
-        for t_id, (best_cp_id, score) in assignments.items():
+        for t_id in kept:
+            best_cp_id, score = assignments[t_id]
             cp = cp_by_id[best_cp_id]
             t_rows.append({
                 'ptype':     ptype,
@@ -157,7 +238,7 @@ def collect_raw_data(events, results):
         e_rows.append({
             'ptype':           ptype,
             'total_ev_energy': total_ev_energy,
-            'n_reco':          len(tracksters),
+            'n_reco':          len(kept),
             'n_sim':           len(sim_showers),
         })
 
@@ -184,6 +265,26 @@ def _purity_per_bin(tracksters_df, ptype, edges):
         p = (grp['score'] < 0.2).sum() / n
         vals[int(i)] = p
         errs[int(i)] = np.sqrt(p * (1 - p) / n) if n > 1 else 0.0
+    return centers, vals, errs
+
+
+def _cp_efficiency_per_bin(cps_df, ptype, edges):
+    """mean(sum_shared_energy / cp_energy) per CP per bin."""
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    vals = np.full(len(centers), np.nan)
+    errs = np.full(len(centers), np.nan)
+    sub = cps_df[cps_df['ptype'] == ptype]
+    if sub.empty:
+        return centers, vals, errs
+    sub = sub.copy()
+    sub['bin'] = pd.cut(sub['cp_energy'], bins=edges, right=False,
+                        include_lowest=True, labels=False)
+    for i, grp in sub.groupby('bin', observed=False):
+        n = len(grp)
+        if n == 0:
+            continue
+        vals[int(i)] = grp['cp_efficiency'].mean()
+        errs[int(i)] = grp['cp_efficiency'].std() / np.sqrt(n) if n > 1 else 0.0
     return centers, vals, errs
 
 
@@ -234,7 +335,7 @@ def _make_edges(all_data_list, ptype, metric):
     for tracksters_df, cps_df, events_df in all_data_list:
         if metric == 'purity':
             col = tracksters_df.loc[tracksters_df['ptype'] == ptype, 'cp_energy']
-        elif metric == 'efficiency':
+        elif metric in ('efficiency', 'cp_efficiency'):
             col = cps_df.loc[cps_df['ptype'] == ptype, 'cp_energy']
         else:
             col = events_df.loc[events_df['ptype'] == ptype, 'total_ev_energy']
@@ -251,12 +352,14 @@ COLORS = plt.cm.tab10.colors
 
 _PTYPE_LABEL = {'ee': 'EM (ee)', 'pi': 'Hadronic (ππ)'}
 _METRIC_META = {
-    'purity':       ('Purity',        _purity_per_bin,
-                     'Purity  (score < 0.2)',      'CP energy [GeV]'),
-    'efficiency':   ('Efficiency',    _efficiency_per_bin,
-                     'Efficiency  (shared E > 50 %)', 'CP energy [GeV]'),
-    'number_ratio': ('Number ratio',  _number_ratio_per_bin,
-                     'N reco / N sim',              'Total event LC energy [GeV]'),
+    'purity':         ('Purity',                _purity_per_bin,
+                       'Purity  (score < 0.2)',                  'CP energy [GeV]'),
+    'efficiency':     ('Trackster Efficiency',  _efficiency_per_bin,
+                       'Trackster Efficiency  (best shared E > 50 % & reco-to-sim match)', 'CP energy [GeV]'),
+    'cp_efficiency':  ('CP Efficiency',         _cp_efficiency_per_bin,
+                       'CP Efficiency  (Σ shared E / CP E)', 'CP energy [GeV]'),
+    'number_ratio':   ('Number ratio',          _number_ratio_per_bin,
+                       'N reco / N sim',                         'Total event LC energy [GeV]'),
 }
 
 
@@ -266,20 +369,26 @@ def _one_fig(all_data_list, labels, ptype, metric, edges, output_dir):
     fig, ax = plt.subplots(figsize=(8, 5))
     fig.suptitle(f"{title} — {_PTYPE_LABEL[ptype]}", fontsize=12, fontweight="bold")
 
-    for i, (data, label) in enumerate(zip(all_data_list, labels)):
+    color_idx = 0
+    for data, label in zip(all_data_list, labels):
         tracksters_df, cps_df, events_df = data
         centers, vals, errs = bin_fn(
             tracksters_df if metric == 'purity' else
-            cps_df        if metric == 'efficiency' else events_df,
+            cps_df        if metric in ('efficiency', 'cp_efficiency') else events_df,
             ptype, edges,
         )
         valid = ~np.isnan(vals)
+        is_clue3d = label.startswith('CLUE3D')
         ax.errorbar(
             centers[valid], vals[valid], yerr=errs[valid],
-            fmt="o-", label=label,
-            color=COLORS[i % len(COLORS)],
+            fmt='s--' if is_clue3d else 'o-',
+            label=label,
+            color='black' if is_clue3d else COLORS[color_idx % len(COLORS)],
             markersize=4, capsize=3, linewidth=1.5,
+            zorder=3 if is_clue3d else 2,
         )
+        if not is_clue3d:
+            color_idx += 1
 
     ax.set_xlabel(xlabel, fontsize=10)
     ax.set_ylabel(ylabel, fontsize=10)
@@ -294,7 +403,7 @@ def _one_fig(all_data_list, labels, ptype, metric, edges, output_dir):
 
 def make_plots(all_data_list, labels, output_dir):
     for ptype in ('ee', 'pi'):
-        for metric in ('purity', 'efficiency', 'number_ratio'):
+        for metric in ('purity', 'efficiency', 'cp_efficiency', 'number_ratio'):
             edges = _make_edges(all_data_list, ptype, metric)
             _one_fig(all_data_list, labels, ptype, metric, edges, output_dir)
 
@@ -337,20 +446,39 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     print(f"Output  → {output_dir}\n")
 
-    # Load events
+    # Load events — keep ee and pi fully separate from here on
     print("Loading events...", flush=True)
     t0 = time.perf_counter()
-    events = load_events(data_dir=args.data_dir)
+    all_events = load_events(data_dir=args.data_dir)
     print(f"Events loaded in {time.perf_counter() - t0:.1f}s", flush=True)
+
+    ee_events = [e for e in all_events if e['particle_type'] == 'ee']
+    pi_events = [e for e in all_events if e['particle_type'] == 'pi']
     if args.n_events is not None:
-        ee = [e for e in events if e['particle_type'] == 'ee'][:args.n_events]
-        pi = [e for e in events if e['particle_type'] == 'pi'][:args.n_events]
-        events = [e for pair in zip(ee, pi) for e in pair]
-        print(f"Using {len(ee)} ee + {len(pi)} pi = {len(events)} events\n", flush=True)
+        ee_events = ee_events[:args.n_events]
+        pi_events = pi_events[:args.n_events]
+    print(f"Using {len(ee_events)} ee + {len(pi_events)} pi events\n", flush=True)
+
+    # CLUE3D baseline — computed once, added as first curve on every plot
+    print("Loading CLUE3D baseline...", flush=True)
+    t0 = time.perf_counter()
+    c3d_ee = load_clue3d_results(args.data_dir, 'ee', ee_events)
+    c3d_pi = load_clue3d_results(args.data_dir, 'pi', pi_events)
+    c3d_ee_t, c3d_ee_c, c3d_ee_e = collect_raw_data(ee_events, c3d_ee)
+    c3d_pi_t, c3d_pi_c, c3d_pi_e = collect_raw_data(pi_events, c3d_pi)
+    clue3d_data = (
+        pd.concat([c3d_ee_t, c3d_pi_t], ignore_index=True),
+        pd.concat([c3d_ee_c, c3d_pi_c], ignore_index=True),
+        pd.concat([c3d_ee_e, c3d_pi_e], ignore_index=True),
+    )
+    n_c3d_ee = sum(1 for r in c3d_ee if not r['infeasible'])
+    n_c3d_pi = sum(1 for r in c3d_pi if not r['infeasible'])
+    print(f"CLUE3D loaded in {time.perf_counter() - t0:.1f}s  "
+          f"(feasible: {n_c3d_ee} ee, {n_c3d_pi} pi)\n", flush=True)
 
     # Run CLUEstering for each chosen row, collect DataFrames
-    all_data_list = []
-    labels        = []
+    all_data_list = [clue3d_data]
+    labels        = ['CLUE3D']
 
     for row_num in args.rows:
         row = ranked[ranked["rank"] == row_num].iloc[0]
@@ -359,14 +487,24 @@ def main():
         label = f"Row {row_num}  (score={row['score']:.3f})"
         print(f"\nRunning CLUEstering for {label}...")
 
-        results = _run_events(events, cee_params, che_params)
-        tracksters_df, cps_df, events_df = collect_raw_data(events, results)
+        print("  ee events:", flush=True)
+        ee_results = _run_events(ee_events, cee_params, che_params, tag='ee')
+        print("  pi events:", flush=True)
+        pi_results = _run_events(pi_events, cee_params, che_params, tag='pi')
+
+        ee_t, ee_c, ee_e = collect_raw_data(ee_events, ee_results)
+        pi_t, pi_c, pi_e = collect_raw_data(pi_events, pi_results)
+
+        tracksters_df = pd.concat([ee_t, pi_t], ignore_index=True)
+        cps_df        = pd.concat([ee_c, pi_c], ignore_index=True)
+        events_df     = pd.concat([ee_e, pi_e], ignore_index=True)
+
         all_data_list.append((tracksters_df, cps_df, events_df))
         labels.append(label)
 
-        n_ee = sum(1 for r in results if not r['infeasible'] and r['particle_type'] == 'ee')
-        n_pi = sum(1 for r in results if not r['infeasible'] and r['particle_type'] == 'pi')
-        print(f"  feasible events: {n_ee} ee, {n_pi} pi")
+        n_ee = sum(1 for r in ee_results if not r['infeasible'])
+        n_pi = sum(1 for r in pi_results if not r['infeasible'])
+        print(f"  feasible: {n_ee} ee, {n_pi} pi")
 
     print("\nGenerating plots...")
     make_plots(all_data_list, labels, output_dir)

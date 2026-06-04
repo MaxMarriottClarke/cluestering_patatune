@@ -29,8 +29,8 @@ plt.rcParams.update({
     "grid.linestyle":   "--",
 })
 
-RESULTS_DIR = Path("results")
-OUTPUT_DIR  = Path("/eos/user/m/mmarriot/php-plots/cluestering/parameters")
+RESULTS_DIR = Path("results_che_newf3")
+OUTPUT_DIR  = Path("/eos/user/m/mmarriot/php-plots/cluestering/parameters2")
 
 PARAM_NAMES = [
     "density_radius_cee", "min_density_cee", "outlier_distance_cee",

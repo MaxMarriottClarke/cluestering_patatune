@@ -3,7 +3,7 @@
   "particle_type": "pi",
   "n_events": 500,
   "pareto_size": 100,
-  "wall_time_h": 5.631,
+  "wall_time_h": 6.45,
   "param_names": [
     "density_radius_che",
     "min_density_che",
